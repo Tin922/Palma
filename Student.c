@@ -11,55 +11,43 @@ typedef struct Student {
 	char Surname[MAX_NAME];
 	int StudentNumber;
 }Student;
-/*
+
 int CountF()
 {
 	int countStudent = 0;
 	char buffer[MAX_SIZE_ROW] = { 0 };
 	FILE* f = NULL;
-	//printf("Insert file name\n");
+	
+	f=fopen("studenti.txt","r");
 
-	if ((fopen("Cranberry.txt", "r")) == NULL)
+	if(f==NULL)
 	{
-		printf("File je prazan");
+		printf("file je prazan");
 	}
-	else printf("FIle nije prazan");
+	
 
 	while (!feof(f))
 	{
 		fgets(buffer, MAX_SIZE_ROW, f);
-		if (strcmp(buffer, "\n") == 0)
-			break;
-		else countStudent++;
+		if (strcmp("\n",buffer) != 0)
+			countStudent++;
 	}
 
 	fclose(f);
 	return countStudent;
-}*/
+}
 
 void main()
 {
 	int countStudent = 0;
 	char buffer[MAX_SIZE_ROW] = { 0 };
 	FILE* f = NULL;
-	//printf("Insert file name\n");
+	
+	countStudent=CountF();
 
-	if ((fopen("Cranberry.txt", "r")) == NULL)
-	{
-		printf("File je prazan");
-	}
-	else printf("FIle nije prazan");
 
-	while (!feof(f))
-	{
-		//fgets(buffer, MAX_SIZE_ROW, f);
-		if (strcmp(buffer, "\n") == 0)
-			break;
-		else countStudent++;
-	}
-
-	fclose(f);
-	//int countStudent = CountF();
+	
+	
 	printf("CountStudent ");
 	printf("CountStudent = %d", countStudent);
 }

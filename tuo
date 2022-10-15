@@ -11,7 +11,7 @@ typedef struct Student {
 	char Surname[MAX_NAME];
 	int StudentNumber;
 }Student;
-/*
+
 int CountF()
 {
 	int countStudent = 0;
@@ -35,7 +35,7 @@ int CountF()
 
 	fclose(f);
 	return countStudent;
-}*/
+}
 
 void main()
 {
