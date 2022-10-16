@@ -13,13 +13,13 @@ typedef struct Student {
 	int StudentNumber;
 }Student;
 
-int CountF()
+int CountF(char *filename)
 {
 	int countStudent = 0;
 	char buffer[MAX_SIZE_ROW] = { 0 };
 	FILE* f = NULL;
 	
-	f=fopen("studenti.txt","r");
+	f=fopen(filename,"r");
 
 	if(f==NULL)
 	{
@@ -72,9 +72,13 @@ void main()
 	int countStudent = 0;
 	char buffer[MAX_SIZE_ROW] = { 0 };
 	FILE* f = NULL;
+	char filename[50];
+
+	printf("upisite ime datoteke:\n");
+	scanf("%s",filename);
 	
 	
-	countStudent=CountF();
+	countStudent=CountF(filename);
 	getDataAndPrintData(countStudent);
 	
 }
