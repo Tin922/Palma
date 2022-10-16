@@ -38,7 +38,7 @@ int CountF(char *filename)
 	return countStudent;
 }
 
-void getDataAndPrintData(int countStudent)
+void getDataAndPrintData(int countStudent, char* filename)
 {
 	Student *s;
 	FILE *f;
@@ -47,7 +47,7 @@ void getDataAndPrintData(int countStudent)
 	
 	s=(Student*)malloc(sizeof(Student)*countStudent);
 	
-	f=fopen("studenti.txt","r");
+	f=fopen(filename,"r");
 
 	for(int i=0;i<countStudent;i++)	
 	{
@@ -79,6 +79,6 @@ void main()
 	
 	
 	countStudent=CountF(filename);
-	getDataAndPrintData(countStudent);
+	getDataAndPrintData(countStudent,filename);
 	
 }
