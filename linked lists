@@ -74,6 +74,24 @@ void InsertAfter(Node* node, int value, char* name, char* surname)
 	node->next = newNode;
 }
 
+void insertSorted(Node** root, int value, char* name, char* surname)
+{
+	if (*root == NULL || surname[0] <= (*root)->Surname[0])
+	{
+		InsertAtTheBeggining(root, value, name, surname);
+		return;
+	}
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+	{
+		if (surname[0] <= currentEl->next->Surname[0])
+		{
+			break;											//	insertAfter(*root, value, name, surname);//	return;
+		}
+		currentEl = currentEl->next;
+	}
+	InsertAfter(currentEl, value, name, surname);
+}
 int main()
 {
 	int i, numberOfStudents = 0, nodeNumber = 0;
@@ -87,7 +105,7 @@ int main()
 		root->x = 5;
 		root->next = NULL;*/
 
-	printf("Koliko jos studenata zelite dodati?\n: ");
+	printf("Koliko jos studenata zelite dodati sortirane?\n: ");
 	scanf("%d", &numberOfStudents);
 	for (i = 0; i < numberOfStudents; i++)
 	{
@@ -97,7 +115,8 @@ int main()
 		scanf("%s", surname);
 		printf("\nUnesite godinu rodenja studenta\n: ");
 		scanf("%d", &BirthYear);
-		InsertEnd(&root, BirthYear, name, surname);
+
+		insertSorted(&root, BirthYear, name, surname);
 	}
 	/*forprintf("Koliko jos studenata zelite dodati na pocetak?\n: ");
 scanf("%d", &numberOfStudents);
@@ -112,7 +131,7 @@ scanf("%d", &numberOfStudents);
 	InsertAtTheBeggining(&root, BirthYear, name, surname);
 }*/
 
-	printf("Koliko jos studenata zelite dodati na pocetak?\n: ");
+/*	printf("Koliko jos studenata zelite dodati na pocetak?\n: ");
 	scanf("%d", &numberOfStudents);
 	for (i = 0; i < numberOfStudents; i++)
 	{
@@ -132,7 +151,7 @@ scanf("%d", &numberOfStudents);
 			currentEl = currentEl->next;
 		}
 		InsertAfter(currentEl, BirthYear, name, surname);
-	}
+	}*/
 
 	for (Node* currentEl = root; currentEl != NULL; currentEl = currentEl->next)
 	{
