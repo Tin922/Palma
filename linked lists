@@ -1,0 +1,143 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_NAME 1024
+
+typedef struct Node {
+	char Name[MAX_NAME];
+	char Surname[MAX_NAME];
+	int YearOfBirth;
+	struct Node* next;
+}Node;
+
+void InsertEnd(Node** root, int value, char* name, char* surname)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL)
+		exit(1);
+
+	newNode->next = NULL;
+	newNode->YearOfBirth = value;
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	if (*root == NULL) // ako je slucajno prazan root onda je novi zapravo prvi element
+	{
+		*root = newNode;
+		return;
+	}
+
+	Node* currentEl = *root;		//trenutni element je rood dereferenced jedan put jer smo poslali adresu
+	while (currentEl->next != NULL)		  // radi dok ne dode do zadnjeg
+	{
+		currentEl = currentEl->next;
+	}								  // dosli smo do nodea prije NULL
+	currentEl->next = newNode;
+}
+
+void deallocate(Node** root)
+{
+	Node* currentEl = *root;
+	while (currentEl != NULL)
+	{
+		Node* tempCurrent = currentEl;
+		currentEl = currentEl->next;
+		free(tempCurrent);
+	}
+	*root = NULL;
+}
+
+void InsertAtTheBeggining(Node** root, int value, char* name, char* surname)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL)
+		exit(3);
+
+	newNode->YearOfBirth = value;
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->next = *root;
+
+	*root = newNode;
+}
+
+void InsertAfter(Node* node, int value, char* name, char* surname)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL)
+		exit(2);
+	newNode->YearOfBirth = value;
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+
+	newNode->next = node->next;
+	node->next = newNode;
+}
+
+int main()
+{
+	int i, numberOfStudents = 0, nodeNumber = 0;
+	int BirthYear = 0;
+	Node* root = NULL;
+	char name[MAX_NAME];
+	char surname[MAX_NAME];
+	/*	Node* root = malloc(sizeof(Node));
+		if (root == NULL)
+			exit(2);
+		root->x = 5;
+		root->next = NULL;*/
+
+	printf("Koliko jos studenata zelite dodati?\n: ");
+	scanf("%d", &numberOfStudents);
+	for (i = 0; i < numberOfStudents; i++)
+	{
+		printf("Unesite ime studenta: ");
+		scanf("%s", name);
+		printf("\nUnesite prezime studenta: ");
+		scanf("%s", surname);
+		printf("\nUnesite godinu rodenja studenta\n: ");
+		scanf("%d", &BirthYear);
+		InsertEnd(&root, BirthYear, name, surname);
+	}
+	/*forprintf("Koliko jos studenata zelite dodati na pocetak?\n: ");
+scanf("%d", &numberOfStudents);
+ (i = 0; i < numberOfStudents; i++)
+{
+	printf("Unesite ime studenta: ");
+	scanf("%s", name);
+	printf("\nUnesite prezime studenta: ");
+	scanf("%s", surname);
+	printf("\nUnesite godinu rodenja studenta\n: ");
+	scanf("%d", &BirthYear);
+	InsertAtTheBeggining(&root, BirthYear, name, surname);
+}*/
+
+	printf("Koliko jos studenata zelite dodati na pocetak?\n: ");
+	scanf("%d", &numberOfStudents);
+	for (i = 0; i < numberOfStudents; i++)
+	{
+		printf("Iza kojeg elementa zelite dodati jos node\n: ");
+		scanf("%d", &nodeNumber);
+
+		printf("Unesite ime studenta: ");
+		scanf("%s", name);
+		printf("\nUnesite prezime studenta: ");
+		scanf("%s", surname);
+		printf("\nUnesite godinu rodenja studenta\n: ");
+		scanf("%d", &BirthYear);
+
+		Node* currentEl = root;
+		for (i = 0; i < (nodeNumber - 1); i++)
+		{
+			currentEl = currentEl->next;
+		}
+		InsertAfter(currentEl, BirthYear, name, surname);
+	}
+
+	for (Node* currentEl = root; currentEl != NULL; currentEl = currentEl->next)
+	{
+		printf("%s %s year of birth = %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+	}
+	free(root);
+	return 0;
+}
