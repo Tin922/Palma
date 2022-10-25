@@ -1,0 +1,260 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_NAME 1024
+
+typedef struct Node {
+	char Name[MAX_NAME];
+	char Surname[MAX_NAME];
+	int YearOfBirth;
+	struct Node* next;
+}Node;
+
+void InsertAtTheStart(Node** root, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL)
+		exit(3);
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	newNode->next = *root;
+	*root = newNode;
+}
+
+void PrintList(Node* root)
+{
+	for (Node* currentEl = root; currentEl != NULL; currentEl = currentEl->next)
+	{
+		printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+	}
+}
+
+void Deallocation(Node** root)
+{
+	Node* currentEl = *root;
+
+	while (currentEl != NULL)
+	{
+		Node* toDelete = currentEl;
+		currentEl = currentEl->next;
+		free(toDelete);
+	}
+	*root = NULL;
+}
+
+void InsertEnd(Node** root, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL)
+		exit(2);
+	newNode->next = NULL;
+	if (*root == NULL)
+	{
+		InsertAtTheStart(root, name, surname, yearofbirth);
+		return;
+	}
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+		currentEl = currentEl->next;
+
+	currentEl->next = newNode;
+}
+
+void InsertAfter(Node* node, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	newNode->next = node->next;
+	node->next = newNode;
+}
+
+//InsertBefore(root->next->next, name, surname, yearofbirth);
+void InsertBefore(Node** root, Node* node, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	if (*root == node) {
+		InsertAtTheStart(root, name, surname, yearofbirth);
+		return;
+	}
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	newNode->next = node;
+	Node* currentEl = *root;
+	while (currentEl->next != node) {
+		currentEl = currentEl->next;
+	}
+	currentEl->next = newNode;
+}
+
+void InsertSorted(Node** root, Node** studenti, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode;
+	newNode = malloc(sizeof(Node));
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	if ((*root) == NULL || strcmp(surname, (*root)->Surname) < 0)
+	{
+		InsertAtTheStart(root, name, surname, yearofbirth);
+		return;
+	}
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+	{
+		if (strcmp(surname, currentEl->next->Surname) < 0)
+		{
+			InsertAfter(currentEl, name, surname, yearofbirth);
+			return;
+		}
+
+		else if (strcmp(surname, currentEl->next->Surname) == 0)
+			if (strcmp(name, currentEl->next->Name) < 0)
+			{
+				InsertAfter(currentEl, name, surname, yearofbirth);
+				return;
+			}
+
+		currentEl = currentEl->next;
+	}
+	InsertAfter(currentEl, name, surname, yearofbirth);
+}
+
+void RemoveElement(Node** root, int yearofbirth)
+{
+	if (*root == NULL)
+		return;
+
+	if ((*root)->YearOfBirth == yearofbirth)
+	{
+		Node* toRemove = *root;
+		*root = (*root)->next;
+		free(toRemove);
+		return;
+	}
+	for (Node* curr = *root; curr->next != NULL; curr = curr->next)
+	{
+		if (curr->next->YearOfBirth == yearofbirth)
+		{
+			Node* toRemove = curr->next;
+			curr->next = curr->next->next;
+			free(toRemove->next);
+			return;
+		}
+	}
+}
+
+int CountStudents()
+{
+	int countStudent = 0;
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL)
+	{
+		printf("File is empty");
+		exit(1);
+	}
+	char buffer[MAX_NAME] = { 0 };
+
+	while (!feof(file))
+	{
+		fgets(buffer, MAX_NAME, file);
+		if (strcmp(buffer, "\n") != 0)
+		{
+			countStudent++;
+		}
+	}
+	return countStudent;
+}
+
+int ReadFileAndFillStructs(Node** root)
+{
+	int i;
+	int countStudent = 0;
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL)
+	{
+		printf("File is empty");
+		exit(1);
+	}
+	countStudent = CountStudents();
+	printf("CountStudents = %d\n", countStudent);
+
+	Node* studenti;
+	studenti = malloc(sizeof(Node) * countStudent);
+
+	for (i = 0; i < countStudent; i++)
+	{
+		fscanf(file, "%s %s %d", studenti[i].Name, studenti[i].Surname, &studenti[i].YearOfBirth);
+	}
+	for (i = 0; i < countStudent; i++)
+		InsertSorted(root, studenti, studenti[i].Name, studenti[i].Surname, studenti[i].YearOfBirth);
+}
+
+//
+//	Node* currentEl = *root;
+//	while (currentEl->next->Surname != surname)
+//	{
+//		currentEl = currentEl->next;
+//	}
+//	Node* toRemove = currentEl->next;
+//	currentEl->next = currentEl->next->next;
+//	free(toRemove->next);
+//}
+
+int main()
+{
+	Node* root = NULL;
+	//Node* root = malloc(sizeof(Node));
+	char name[MAX_NAME];
+	char surname[MAX_NAME];
+	int i, yearofbirth = 0;
+	int studentCount = 0;
+	//printf("Koliko studenata zelite unijeti:  ");
+	//scanf("%d", &studentCount);
+	//for (i = 0; i < studentCount; i++)
+	//{
+	//	printf("Unesi ime: ");
+	//	scanf(" %s", name);
+	//	printf("Unesi prezime: ");
+	//	scanf(" %s", surname);
+	//	printf("Unesi godinu rodenja: ");
+	//	scanf("%d", &yearofbirth);
+	//	InsertEnd(&root, name, surname, yearofbirth);
+	//}
+
+	//printf("Unesi prezime za uklonit: ");
+	//scanf(" %s", surname);
+	//InsertBefore(&root, root->next->next, name, surname, yearofbirth);
+	//InsertAfter(root->next, name, surname, yearofbirth);
+	//InsertAtTheStart(&root, "Ivan", "Ivancic", 2002);
+	//RemoveElement(&root, 1);
+	//RemoveElement(&root, 2);
+	//RemoveElement(&root, 3);
+
+	ReadFileAndFillStructs(&root);
+
+	PrintList(root);
+
+	//Deallocation(&root);
+
+	return 0;
+}
