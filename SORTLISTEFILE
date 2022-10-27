@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX_NAME 1024
+
 typedef struct Node {
 	char Name[MAX_NAME];
 	char Surname[MAX_NAME];
@@ -10,17 +11,92 @@ typedef struct Node {
 	struct Node* next;
 }Node;
 
-void findElement(Node* root) {
+int findElement(Node* root);
+void InsertAtTheStart(Node** root, char* name, char* surname, int yearofbirth);
+void PrintList(Node* root);
+void Deallocation(Node** root);
+void InsertEnd(Node** root, char* name, char* surname, int yearofbirth);
+void InsertAfter(Node* node, char* name, char* surname, int yearofbirth);
+void InsertBefore(Node** root, Node* node, char* name, char* surname, int yearofbirth);
+void InsertSorted(Node** root, Node** studenti, char* name, char* surname, int yearofbirth);
+void RemoveElement(Node** root);
+int CountStudents();
+void ReadFileAndFillStructs(Node** root);
+void WriteIntoFile(Node* root)
+{
+	FILE* file = fopen("list.txt", "w");
+	if (file == NULL)
+	{ 
+		printf("Didnt open new file\n");
+		return;
+	}
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		fprintf(file, "%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+		currentEl = currentEl->next;
+	}
+	fclose(file);
+}
+int main()
+{
+	Node* root = NULL;
+	//Node* root = malloc(sizeof(Node));
+	char name[MAX_NAME];
+	char surname[MAX_NAME];
+	int i, yearofbirth = 0;
+	int studentCount = 0;
+	//printf("Koliko studenata zelite unijeti:  ");
+	//scanf("%d", &studentCount);
+	//for (i = 0; i < studentCount; i++)
+	//{
+	//	printf("Unesi ime: ");
+	//	scanf(" %s", name);
+	//	printf("Unesi prezime: ");
+	//	scanf(" %s", surname);
+	//	printf("Unesi godinu rodenja: ");
+	//	scanf("%d", &yearofbirth);
+	//	InsertEnd(&root, name, surname, yearofbirth);
+	//}
+	//printf("Unesi prezime za uklonit: ");
+	//scanf(" %s", surname);
+	//InsertBefore(&root, root->next->next, name, surname, yearofbirth);
+	//InsertAfter(root->next, name, surname, yearofbirth);
+	//InsertAtTheStart(&root, "Ivan", "Ivancic", 2002);
+	ReadFileAndFillStructs(&root);
+	//RemoveElement(&root);
+	PrintList(root);
+	Node* currentEl = findElement(&root);
+	printf("MAIN PRINT %s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
 
+	WriteIntoFile(root);
+
+	Deallocation(&root);
+	return 0;
+}
+int findElement(Node** root) {
+	int i = 0;
 	char findSurname[MAX_NAME] = { 0 };
-	printf("\nUnesite prezime elementa koji zelite pronaći: ");
+	printf("\nUnesite prezime elementa koji zelite pronaci: ");
 	scanf(" %s", findSurname);
 
+	Node* currentEl = *root;
+	while (currentEl != NULL)
+	{
+		if (strcmp(currentEl->Surname, findSurname) == 0)
+		{
+			i++;
+			break;
+		}
+		currentEl = currentEl->next;
+	}
+	printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
 
+	if (i == 1) printf("Nadeno je prezime\n");
+	else if (i == 0) printf("Nema tog prezimena u listi");
 
-
+	return currentEl;
 }
-
 void InsertAtTheStart(Node** root, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode = malloc(sizeof(Node));
@@ -34,7 +110,6 @@ void InsertAtTheStart(Node** root, char* name, char* surname, int yearofbirth)
 	newNode->next = *root;
 	*root = newNode;
 }
-
 void PrintList(Node* root)
 {
 	for (Node* currentEl = root; currentEl != NULL; currentEl = currentEl->next)
@@ -42,7 +117,6 @@ void PrintList(Node* root)
 		printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
 	}
 }
-
 void Deallocation(Node** root)
 {
 	Node* currentEl = *root;
@@ -55,7 +129,6 @@ void Deallocation(Node** root)
 	}
 	*root = NULL;
 }
-
 void InsertEnd(Node** root, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode = malloc(sizeof(Node));
@@ -78,7 +151,6 @@ void InsertEnd(Node** root, char* name, char* surname, int yearofbirth)
 
 	currentEl->next = newNode;
 }
-
 void InsertAfter(Node* node, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode = malloc(sizeof(Node));
@@ -91,8 +163,6 @@ void InsertAfter(Node* node, char* name, char* surname, int yearofbirth)
 	newNode->next = node->next;
 	node->next = newNode;
 }
-
-//InsertBefore(root->next->next, name, surname, yearofbirth);
 void InsertBefore(Node** root, Node* node, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode = malloc(sizeof(Node));
@@ -113,7 +183,6 @@ void InsertBefore(Node** root, Node* node, char* name, char* surname, int yearof
 	}
 	currentEl->next = newNode;
 }
-
 void InsertSorted(Node** root, Node** studenti, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode;
@@ -148,7 +217,6 @@ void InsertSorted(Node** root, Node** studenti, char* name, char* surname, int y
 	}
 	InsertAfter(currentEl, name, surname, yearofbirth);
 }
-
 void RemoveElement(Node** root)
 {
 	char surnameToRemove[MAX_NAME] = { 0 };
@@ -176,7 +244,6 @@ void RemoveElement(Node** root)
 		}
 	}
 }
-
 int CountStudents()
 {
 	int countStudent = 0;
@@ -198,7 +265,6 @@ int CountStudents()
 	}
 	return countStudent;
 }
-
 void ReadFileAndFillStructs(Node** root)
 {
 	int i;
@@ -222,58 +288,6 @@ void ReadFileAndFillStructs(Node** root)
 	for (i = 0; i < countStudent; i++)
 	{
 		InsertSorted(root, studenti, studenti[i].Name, studenti[i].Surname, studenti[i].YearOfBirth);
-		free(studenti);
+		//free(studenti);
 	}
-}
-
-//
-//	Node* currentEl = *root;
-//	while (currentEl->next->Surname != surname)
-//	{
-//		currentEl = currentEl->next;
-//	}
-//	Node* toRemove = currentEl->next;
-//	currentEl->next = currentEl->next->next;
-//	free(toRemove->next);
-//}
-
-int main()
-{
-	Node* root = NULL;
-	//Node* root = malloc(sizeof(Node));
-	char name[MAX_NAME];
-	char surname[MAX_NAME];
-	int i, yearofbirth = 0;
-	int studentCount = 0;
-	char removeprezime[100] = "Zvancidc";
-	//printf("Koliko studenata zelite unijeti:  ");
-	//scanf("%d", &studentCount);
-	//for (i = 0; i < studentCount; i++)
-	//{
-	//	printf("Unesi ime: ");
-	//	scanf(" %s", name);
-	//	printf("Unesi prezime: ");
-	//	scanf(" %s", surname);
-	//	printf("Unesi godinu rodenja: ");
-	//	scanf("%d", &yearofbirth);
-	//	InsertEnd(&root, name, surname, yearofbirth);
-	//}
-
-	//printf("Unesi prezime za uklonit: ");
-	//scanf(" %s", surname);
-	//InsertBefore(&root, root->next->next, name, surname, yearofbirth);
-	//InsertAfter(root->next, name, surname, yearofbirth);
-	//InsertAtTheStart(&root, "Ivan", "Ivancic", 2002);
-	//RemoveElement(&root, 1);
-	//RemoveElement(&root, 2);
-	//RemoveElement(&root, 3);
-
-	ReadFileAndFillStructs(&root);
-
-	RemoveElement(&root);
-
-	PrintList(root);
-	//Deallocation(&root);
-
-	return 0;
 }
