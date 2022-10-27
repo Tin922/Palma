@@ -52,10 +52,12 @@ int main()
 
 	ReadFileAndFillStructs(&root);
 	//RemoveElement(&root);
+	RemoveElement(&root);
 	PrintList(root);
 	Node* currentEl = findElement(&root);
 	printf("MAIN PRINT %s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
 
+	
 	WriteIntoFile(root);
 	Deallocation(&root);
 	return 0;
@@ -180,7 +182,6 @@ void InsertSorted(Node** root, char* name, char* surname, int yearofbirth)
 		InsertAtTheStart(root, name, surname, yearofbirth);
 		return;
 	}
-
 	strcpy(newNode->Name, name);
 	strcpy(newNode->Surname, surname);
 	newNode->YearOfBirth = yearofbirth;
@@ -213,10 +214,11 @@ void RemoveElement(Node** root)
 
 	if (strcmp((*root)->Surname, surnameToRemove) == 0)
 	{
-		Node* toRemove = *root;
+		free(*root);
+		/*Node* toRemove = *root;
 		*root = (*root)->next;
 		free(toRemove);
-		return;
+		return;*/
 	}
 	for (Node* curr = *root; curr->next != NULL; curr = curr->next)
 	{
