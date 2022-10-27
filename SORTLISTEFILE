@@ -3,13 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX_NAME 1024
-
 typedef struct Node {
 	char Name[MAX_NAME];
 	char Surname[MAX_NAME];
 	int YearOfBirth;
 	struct Node* next;
 }Node;
+
+void findElement(Node* root) {
+
+	char findSurname[MAX_NAME] = { 0 };
+	printf("\nUnesite prezime elementa koji zelite pronaći: ");
+	scanf(" %s", findSurname);
+
+
+
+
+}
 
 void InsertAtTheStart(Node** root, char* name, char* surname, int yearofbirth)
 {
@@ -139,12 +149,16 @@ void InsertSorted(Node** root, Node** studenti, char* name, char* surname, int y
 	InsertAfter(currentEl, name, surname, yearofbirth);
 }
 
-void RemoveElement(Node** root, int yearofbirth)
+void RemoveElement(Node** root)
 {
+	char surnameToRemove[MAX_NAME] = { 0 };
+	printf("\nUnesite prezime koje zelite izbrisati: ");
+	scanf(" %s", surnameToRemove);
+
 	if (*root == NULL)
 		return;
 
-	if ((*root)->YearOfBirth == yearofbirth)
+	if (strcmp((*root)->Surname, surnameToRemove) == 0)
 	{
 		Node* toRemove = *root;
 		*root = (*root)->next;
@@ -153,11 +167,11 @@ void RemoveElement(Node** root, int yearofbirth)
 	}
 	for (Node* curr = *root; curr->next != NULL; curr = curr->next)
 	{
-		if (curr->next->YearOfBirth == yearofbirth)
+		if (strcmp(curr->next->Surname, surnameToRemove) == 0)
 		{
 			Node* toRemove = curr->next;
 			curr->next = curr->next->next;
-			free(toRemove->next);
+			free(toRemove);
 			return;
 		}
 	}
@@ -185,7 +199,7 @@ int CountStudents()
 	return countStudent;
 }
 
-int ReadFileAndFillStructs(Node** root)
+void ReadFileAndFillStructs(Node** root)
 {
 	int i;
 	int countStudent = 0;
@@ -206,7 +220,10 @@ int ReadFileAndFillStructs(Node** root)
 		fscanf(file, "%s %s %d", studenti[i].Name, studenti[i].Surname, &studenti[i].YearOfBirth);
 	}
 	for (i = 0; i < countStudent; i++)
+	{
 		InsertSorted(root, studenti, studenti[i].Name, studenti[i].Surname, studenti[i].YearOfBirth);
+		free(studenti);
+	}
 }
 
 //
@@ -228,6 +245,7 @@ int main()
 	char surname[MAX_NAME];
 	int i, yearofbirth = 0;
 	int studentCount = 0;
+	char removeprezime[100] = "Zvancidc";
 	//printf("Koliko studenata zelite unijeti:  ");
 	//scanf("%d", &studentCount);
 	//for (i = 0; i < studentCount; i++)
@@ -252,8 +270,9 @@ int main()
 
 	ReadFileAndFillStructs(&root);
 
-	PrintList(root);
+	RemoveElement(&root);
 
+	PrintList(root);
 	//Deallocation(&root);
 
 	return 0;
