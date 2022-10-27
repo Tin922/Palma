@@ -22,22 +22,8 @@ void InsertSorted(Node** root, char* name, char* surname, int yearofbirth);
 void RemoveElement(Node** root);
 int CountStudents();
 void ReadFileAndFillStructs(Node** root);
-void WriteIntoFile(Node* root)
-{
-	FILE* file = fopen("list.txt", "w");
-	if (file == NULL)
-	{
-		printf("Didnt open new file\n");
-		return;
-	}
-	Node* currentEl = root;
-	while (currentEl != NULL)
-	{
-		fprintf(file, "%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
-		currentEl = currentEl->next;
-	}
-	fclose(file);
-}
+void WriteIntoFile(Node* root);
+
 int main()
 {
 	Node* root = NULL;
@@ -63,6 +49,7 @@ int main()
 	//InsertBefore(&root, root->next->next, name, surname, yearofbirth);
 	//InsertAfter(root->next, name, surname, yearofbirth);
 	//InsertAtTheStart(&root, "Ivan", "Ivancic", 2002);
+
 	ReadFileAndFillStructs(&root);
 	//RemoveElement(&root);
 	PrintList(root);
@@ -70,10 +57,10 @@ int main()
 	printf("MAIN PRINT %s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
 
 	WriteIntoFile(root);
-
 	Deallocation(&root);
 	return 0;
 }
+
 int findElement(Node** root) {
 	int i = 0;
 	char findSurname[MAX_NAME] = { 0 };
@@ -188,31 +175,29 @@ void InsertSorted(Node** root, char* name, char* surname, int yearofbirth)
 	Node* newNode;
 	newNode = malloc(sizeof(Node));
 
-	strcpy(newNode->Name, name);
-	strcpy(newNode->Surname, surname);
-	newNode->YearOfBirth = yearofbirth;
-
 	if ((*root) == NULL || strcmp(surname, (*root)->Surname) < 0)
 	{
 		InsertAtTheStart(root, name, surname, yearofbirth);
 		return;
 	}
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
 	Node* currentEl = *root;
 	while (currentEl->next != NULL)
 	{
 		if (strcmp(surname, currentEl->next->Surname) < 0)
 		{
-			InsertAfter(currentEl, name, surname, yearofbirth);
-			return;
+			break;
 		}
 
 		else if (strcmp(surname, currentEl->next->Surname) == 0)
 			if (strcmp(name, currentEl->next->Name) < 0)
 			{
-				InsertAfter(currentEl, name, surname, yearofbirth);
-				return;
+				break;
 			}
-
 		currentEl = currentEl->next;
 	}
 	InsertAfter(currentEl, name, surname, yearofbirth);
@@ -269,6 +254,7 @@ void ReadFileAndFillStructs(Node** root)
 {
 	int i;
 	int countStudent = 0;
+	int functionNumber = 0;
 	FILE* file = fopen("t.txt", "r");
 	if (file == NULL)
 	{
@@ -286,8 +272,26 @@ void ReadFileAndFillStructs(Node** root)
 		fscanf(file, "%s %s %d", studenti[i].Name, studenti[i].Surname, &studenti[i].YearOfBirth);
 	}
 	for (i = 0; i < countStudent; i++)
-	{
 		InsertSorted(root, studenti[i].Name, studenti[i].Surname, studenti[i].YearOfBirth);
-		//free(studenti);
-	}
+			
 }
+
+
+
+void WriteIntoFile(Node* root)
+{
+	FILE* file = fopen("list.txt", "w");
+	if (file == NULL)
+	{
+		printf("Didnt open new file\n");
+		return;
+	}
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		fprintf(file, "%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+		currentEl = currentEl->next;
+	}
+	fclose(file);
+}
+
