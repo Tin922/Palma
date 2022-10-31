@@ -1,0 +1,109 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
+typedef struct Node {
+    int x;
+    struct Node* next;
+}Node;
+void InsertSorted(Node** root, int value)
+{
+    Node* newNode = malloc(sizeof(Node));
+    if (newNode == NULL) return;
+
+    newNode->x = value;
+
+    if ((*root) == NULL || value > (*root)->x) {
+        newNode->next = *root;
+        *root = newNode;
+        return;
+    }
+    Node* currentEl = *root;
+    while (currentEl->next != NULL)
+    {
+        if (value > currentEl->next->x)
+        {
+            break;
+        }
+        currentEl = currentEl->next;
+    }
+    newNode->next = currentEl->next;
+    currentEl->next = newNode;
+}
+
+void randSort(Node** root)
+{}
+int main()
+{
+    srand(time(NULL));
+    int arrayParni[20] = { 0 };
+
+    Node* rootParni = NULL;
+    Node* rootNeparni = NULL;
+
+    int arraNepaarni[20] = { 0 };    int i = 0;  int x = 0;  int r = 0;  int brojacNep = 0;int brojacPar = 0;
+    while (i < 20)
+    {
+        r = rand() % 30 + 50;
+        if (r % 2 == 0)
+        {
+            for (x = 0; x < i; x++)
+            {
+                if (arrayParni[x] == r)
+                    break;
+            }
+            if (x == i)
+            {
+                printf("%d ", r);
+                arrayParni[i] = r;
+                InsertSorted(&rootParni, r);
+                i++;
+            }
+        }
+        else if  (r % 2 == 1)
+        {
+            for (x = 0; x < i; x++)
+            {
+                if (arraNepaarni[x] == r)
+                    break;
+            }
+            if (x == i)
+            {
+                printf("%d ", r);
+                arraNepaarni[i] = r;
+                InsertSorted(&rootNeparni, r);
+                i++;
+            }
+        }
+    }
+    i = 0;
+   /* while(i < 10)
+    {
+           r = rand() % 30 + 50;
+        
+     }*/
+    printf("\node parni: ");
+        Node* currentEl = rootParni;
+        while (currentEl != NULL)
+        {
+            printf("%d ", currentEl->x);
+            currentEl = currentEl->next;
+        }
+       printf("\node neparni: ");
+      currentEl = rootNeparni;
+        while (currentEl != NULL)
+        {
+            printf("%d ", currentEl->x);
+            currentEl = currentEl->next;
+        }
+            for (i = 0; i < 10; i++)  free(arraNepaarni[i]);
+        return 0;
+    }
