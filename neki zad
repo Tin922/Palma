@@ -33,73 +33,79 @@ void InsertSorted(Node** root, int value)
     newNode->next = currentEl->next;
     currentEl->next = newNode;
 }
-
-int main()
+void randFill(Node** rootParni, Node**  rootNeparni)
 {
     srand(time(NULL));
 
-    Node* rootParni = NULL;
-    Node* rootNeparni = NULL;
     int i = 0;  int x = 0;  int r = 0;  int brojacNep = 0; int brojacPar = 0;
     int repeat = 0, repeat1 = 0;
+    Node* curr = *rootParni;
     while (i < 20)
     {
         r = rand() % 30 + 50;
         if (r % 2 == 0 && brojacPar < 10)
         {
             repeat = 0;
-           for (Node* curr = rootParni; curr != NULL; curr = curr->next)
+            for (curr = *rootParni; curr != NULL; curr = curr->next)
             {
-               if (curr->x == r)
-               {
-                   repeat++;
-                   break;
-               }
-            }  
-         if (repeat == 0)
-        {
-            printf(" %d ", r);
-            InsertSorted(&rootParni, r);
-            brojacPar++;
-            i++;
-        }
+                if (curr->x == r)
+                {
+                    repeat++;
+                    break;
+                }
+            }
+            if (repeat == 0)
+            {
+                printf("%d ", r);
+                InsertSorted(rootParni, r);
+                brojacPar++;
+                i++;
+            }
         }
         else if (r % 2 != 0 && brojacNep < 10)
         {
             repeat1 = 0;
-            for (Node* curr1 = rootNeparni; curr1 != NULL; curr1 = curr1->next)
+            for (curr = *rootNeparni; curr != NULL; curr = curr->next)
             {
-                if (curr1->x == r)
+                if (curr->x == r)
                 {
                     repeat1++;
                     break;
                 }
-            } 
-        if(repeat1 == 0)
-        {
-            printf(" %d", r);
-            InsertSorted(&rootNeparni, r);
-            brojacNep++;
-            i++;
-        }
+            }
+            if (repeat1 == 0)
+            {
+                printf("%d ", r);
+                InsertSorted(rootNeparni, r);
+                brojacNep++;
+                i++;
+            }
         }
     }
-    i = 0;
+}
+int main()
+{
+    srand(time(NULL));
 
+    Node* rootParni = NULL;
+    Node* rootNeparni = NULL;
+
+    randFill(&rootParni, &rootNeparni);
+   
     printf("\node parni: ");
-    Node* currentEl3 = rootParni;
-    while (currentEl3 != NULL)
+   Node* curr = rootParni;
+    while (curr != NULL)
     {
-        printf("%d ", currentEl3->x);
-        currentEl3 = currentEl3->next;
+        printf("%d ", curr->x);
+        curr = curr->next;
     }
     printf("\node neparni: ");
-    currentEl3 = rootNeparni;
-    while (currentEl3 != NULL)
+    curr = rootNeparni;
+    while (curr != NULL)
     {
-        printf("%d ", currentEl3->x);
-        currentEl3 = currentEl3->next;
+        printf("%d ", curr->x);
+        curr = curr->next;
     }
-   // for (i = 0; i < 10; i++)  free(arraNepaarni[i]);
+
     return 0;
 }
