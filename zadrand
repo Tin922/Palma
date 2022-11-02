@@ -1,0 +1,123 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+typedef struct Node {
+	char Name[1000];
+	char Surname[1000];
+	int DrugiKolokvij;
+	int PrviKolokvij;
+	struct Node* next;
+
+}Node;
+void insertAtStart(Node** root, char* name, char* surname, int prvikolokvij, int drugikolokvij);
+void InsertSorted(Node** root, char* name, char* surname, int prvikolokvij, int drugikolokvij);
+void printList(Node* root);
+
+void printList(Node* root)
+{
+	Node* curr = root;
+	while (curr != NULL)
+	{
+		printf("%s %s %d %d\n", curr->Name, curr->Surname, curr->PrviKolokvij, curr->DrugiKolokvij);
+			curr = curr->next;
+	}
+}
+void insertAfter(Node* curr, char* name, char* surname, int prvikolokvij, int drugikolokvij)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->PrviKolokvij = prvikolokvij;
+	newNode->DrugiKolokvij = drugikolokvij;
+
+	newNode->next = curr->next;
+	curr->next = newNode;
+}
+void InsertSorted(Node** root, char* name, char* surname, int prvikolokvij, int drugikolokvij)
+{
+	int zbroj = (prvikolokvij + drugikolokvij);
+	
+	if( (*root) == NULL || (zbroj < ((*root)->PrviKolokvij + (*root)->DrugiKolokvij)))
+	{
+		insertAtStart(root, name, surname, prvikolokvij, drugikolokvij);
+		return;
+	}
+	Node* curr = *root;
+	while (curr->next != NULL)
+	{
+		if (zbroj < (curr->next->PrviKolokvij + curr->next->DrugiKolokvij))
+		{
+			insertAfter(curr, name, surname, prvikolokvij, drugikolokvij);
+			return;
+		}
+		curr = curr->next;
+	}
+	insertAfter(curr, name, surname, prvikolokvij, drugikolokvij);
+
+}
+void insertAtStart(Node** root, char* name, char* surname, int prvikolokvij, int drugikolokvij)
+{
+	
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->PrviKolokvij = prvikolokvij;
+	newNode->DrugiKolokvij = drugikolokvij;
+
+	newNode->next = *root;
+	*root = newNode;
+
+}
+
+void ReadFromFile(Node** root)
+{
+	FILE* file1 = fopen("1.txt", "r");
+	{	
+			if (file1 == NULL)
+			{
+				printf("file1 empty");
+				return;
+			}
+	}
+	FILE* file2 = fopen("2.txt", "r");
+	{
+
+		if (file2 == NULL)
+		{
+			printf("file2 empty");
+			return;
+		}
+	}
+
+	Node* student = malloc(sizeof(Node));
+	if (student == NULL) return;
+
+	while (fscanf(file1, "%s %s %d", student->Name, student->Surname, &student->PrviKolokvij) >= 3
+		&& (fscanf(file2, "%s %s %d", student->Name, student->Surname, &student->DrugiKolokvij) >= 3) )
+	{
+		if ((student->PrviKolokvij) >= 50 && student->DrugiKolokvij >= 50)
+		{
+			InsertSorted(root, student->Name, student->Surname, student->PrviKolokvij, student->DrugiKolokvij);
+		}
+	}
+	fclose(file1);
+	fclose(file2);
+	free(student);
+}
+
+int main()
+{
+	Node* root = NULL;
+
+	ReadFromFile(&root);
+	printList(root);
+
+}
