@@ -13,6 +13,31 @@ typedef struct Node
 	struct Node* next;
 }Node;
 
+
+void SortList(Node** root)
+{
+	if (*root == NULL) return;
+	Node* currEXIT = *root;
+	Node* curr = NULL;
+
+	Node* curr2 = NULL;
+	Node* swap = NULL;
+	while (currEXIT->next != NULL)
+	{
+		curr = currEXIT;
+		for(curr2 = (*root)->next; curr2 != NULL; curr2 = curr2->next)
+		{
+			if (strcmp(curr->Surname, curr2->Surname) > 0)
+			{
+				swap = curr;
+				curr->next = curr2->next;
+				curr2->next = swap;;
+			}
+				curr = curr->next;
+		}	
+		currEXIT = currEXIT->next;
+	}
+}
 void InsertAtStart(Node** root, char* name, char* surname, int yearofbirth)
 {
 	Node* newNode = malloc(sizeof(Node));
@@ -225,7 +250,7 @@ void ReadFromFileAndFillNodes(Node** root)
 	Node* student = malloc(sizeof(Node));
 	while (fscanf(file, "%s %s %d", student->Name, student->Surname, &student->YearOfBirth) >= 3)
 	{
-		InsertSorted(root, student->Name, student->Surname, student->YearOfBirth);
+		InsertAtStart(root, student->Name, student->Surname, student->YearOfBirth);
 	}
 	fclose(file);
 	free(student);
@@ -246,6 +271,8 @@ void WriteIntoTheFile(Node* root)
 	}
 	fclose(file);
 }
+
+
 int main()
 {
 	Node* root = NULL;
@@ -262,6 +289,7 @@ int main()
 		printf("7) Add element before a certain surname\n");
 		printf("8) Read From File And Fill Nodes in Sorted order\n");
 		printf("9) Write current list into new text file\n");
+		printf("10) Sort current list\n");
 		printf("0) Quit \n");
 		printf("ENTER CHOICE: ");
 		scanf("%d", &Choice);
@@ -321,12 +349,17 @@ int main()
 			free(Student);
 			break;
 		}
+		
 		case 8: {
 			ReadFromFileAndFillNodes(&root);
 			break;
 		}
 		case 9: {
 			WriteIntoTheFile(root);
+			break;
+		}
+		case 10: {
+			SortList(&root);
 			break;
 		}
 		case 0: {
