@@ -1,0 +1,93 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+typedef struct Node {
+	int X;
+	int Y;
+	struct Node* next;
+}Node;
+
+int ReadFromFile(Node *root);
+int insertSorted(Node* root, int x, int y);
+int insertAfter(Node* curr, int x, int y);
+void PrintList(Node* root);
+
+int main() {
+
+	Node* root = malloc(sizeof(Node));
+	if (root == NULL)
+		return 5;
+
+	root->next = NULL;
+
+	ReadFromFile(root);
+	
+	PrintList(root);
+
+	return 0;
+}
+int ReadFromFile(Node* root)
+{
+	int buffer[100] = { 0 };
+	FILE* file = NULL;
+	file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("FIle not opened\n");
+		return 0;
+	}
+
+	Node* curr = malloc(sizeof(Node));
+	while (!(feof(file)))
+	{
+		fgets(buffer, 100, file);
+		while ( (sscanf(buffer,  "%d %d %n", &curr->X, &curr->Y) >= 2) )
+		{
+			insertSorted(root, curr->X, curr->Y);
+		}
+	}
+	return 0;
+}
+
+int insertAfter( Node* curr,int x, int y)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return 5;
+	newNode->X = x;
+	newNode->Y = y;
+
+	newNode->next = curr->next;
+	curr->next = newNode;
+	
+	return 0;
+}
+int insertSorted(Node* root, int x, int y)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return 5;
+	newNode->X = x;
+	newNode->Y = y;
+
+	Node* curr = root;
+	while (curr->next != NULL)
+	{
+		if ( y < curr->next->Y )
+			break;
+
+		curr = curr->next;
+	}
+	insertAfter(curr, x, y);
+
+	return 0;
+}
+void PrintList(Node* root)
+{
+	Node* currentEl = root->next;
+	while (currentEl != NULL)
+	{
+		printf("%d %d\n", currentEl->X, currentEl->Y);
+		currentEl = currentEl->next;
+	}
+}
