@@ -1,0 +1,374 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX_NAME 1024
+
+typedef struct Node
+{
+	char Surname[MAX_NAME];
+	char Name[MAX_NAME];
+	int YearOfBirth;
+	struct Node* next;
+}Node;
+
+
+void SortList(Node** root)
+{
+	if (*root == NULL) return;
+	Node* currEXIT = *root;
+	Node* curr = NULL;
+
+	Node* curr2 = NULL;
+	Node* swap = NULL;
+	while (currEXIT->next != NULL)
+	{
+		curr = currEXIT;
+		for (curr2 = (*root)->next; curr2 != NULL; curr2 = curr2->next)
+		{
+			if (strcmp(curr->Surname, curr2->Surname) > 0)
+			{
+				swap = curr;
+				curr->next = curr2->next;
+				curr2->next = swap;;
+			}
+			curr = curr->next;
+		}
+		currEXIT = currEXIT->next;
+	}
+}
+void InsertAtStart(Node** root, char* name, char* surname, int yearofbirth)
+{
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	newNode->next = *root;
+	*root = newNode;
+}
+void PrintList(Node* root)
+{
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+		currentEl = currentEl->next;
+	}
+}
+void InsertEnd(Node** root, char* name, char* surname, int yearofbirth)
+{
+	if (*root == NULL)
+	{
+		InsertAtStart(root, name, surname, yearofbirth);
+		return;
+	}
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+	{
+		currentEl = currentEl->next;
+	}
+	newNode->next = NULL;
+	currentEl->next = newNode;
+}
+Node* FindElementSurname(Node* root, char* surname)
+{
+	int i = 0;
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		if (strcmp(surname, currentEl->Surname) == 0)
+		{
+			i++;
+			printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+			break;
+		}
+		currentEl = currentEl->next;
+	}
+	if (i == 0) printf("\nSurname not found in the list\n");
+
+	return currentEl;
+}
+Node* FindElementSurname1(Node* root, char* surname)
+{
+	int i = 0;
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		if (strcmp(surname, currentEl->Surname) == 0)
+		{
+			i++;
+			//printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+			break;
+		}
+		currentEl = currentEl->next;
+	}
+	if (i == 0) printf("\nSurname not found in the list\n");
+
+	return currentEl;
+}
+Node* FindPreviousOfTheElement(Node* root, char* surname)
+{
+	int i = 0;
+	Node* currentEl = root;
+	while (currentEl->next != NULL)
+	{
+		if (strcmp(surname, currentEl->next->Surname) == 0)
+		{
+			i++;
+			printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+			break;
+		}
+		currentEl = currentEl->next;
+	}
+	if (i == 0)
+		printf("\nSurname not found in the list\n");
+
+	return currentEl;
+}
+void Deallocation(Node** root)
+{
+	Node* currentEl = *root;
+	while (currentEl != NULL)
+	{
+		Node* toRemove = currentEl;
+		currentEl = currentEl->next;
+		free(toRemove);
+	}
+	free(*root);
+}
+void RemoveElementSurname(Node** root)
+{
+	char surname[MAX_NAME];
+	printf("Insert surname of a person you want to remove from the list: ");
+	scanf(" %s", surname);
+
+	if (*root == NULL) {
+		printf("Surname not found\n");
+		return;
+	}
+	if (strcmp((*root)->Surname, surname) == 0)
+	{
+		Node* toRemove = (*root);
+		(*root) = (*root)->next;
+		free(toRemove);
+		return;
+	}
+
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+	{
+		if (strcmp(currentEl->next->Surname, surname) == 0)
+		{
+			Node* toRemove = currentEl->next;
+			currentEl->next = currentEl->next->next;
+			free(toRemove);
+			return;
+		}
+		currentEl = currentEl->next;
+	}
+	printf("Surname not found\n");
+}
+void InsertAfterSurname(Node** root, char* name, char* surname, int yearofbirth, char* SurnameRemove)
+{
+	Node* newNode = malloc(sizeof(Node)); if (newNode == NULL) return;
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	/*char SurnameRemove[MAX_NAME];
+	printf("Insert surname of a person you want to add the element after ");
+	scanf(" %s", SurnameRemove);*/
+	//Node* currentEl = malloc(sizeof(Node));
+	Node* currentEl = FindElementSurname1(*root, SurnameRemove);
+
+	newNode->next = currentEl->next;
+	currentEl->next = newNode;
+}
+void InsertBeforeSurname(Node** root, char* name, char* surname, int yearofbirth, char* SurnameBefore)
+{
+	////Node* currentEl = malloc(sizeof(Node));
+	//if (strcmp((*root)->Surname, SurnameBefore) == 0)
+	//{
+	//	InsertAtStart(root, name, surname, yearofbirth);
+	//	return;
+	//}
+	Node* currentEl = FindPreviousOfTheElement(*root, SurnameBefore);
+	///*	if (currentEl->next == *root)
+	//		InsertAtStart(root, name, surname, yearofbirth*/);
+
+	Node* newNode = malloc(sizeof(Node)); if (newNode == NULL) return;
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->YearOfBirth = yearofbirth;
+
+	newNode->next = currentEl->next;
+	currentEl->next = newNode;
+}
+void InsertSorted(Node** root, char* name, char* surname, int yearofbirth)
+{
+	if (*root == NULL || strcmp(surname, (*root)->Surname) < 0)
+	{
+		InsertAtStart(root, name, surname, yearofbirth);
+		return;
+	}
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
+	{
+		if (strcmp(surname, currentEl->next->Surname) < 0)
+		{
+			break;
+		}
+		else if (strcmp(surname, currentEl->next->Surname) == 0)
+		{
+			if (strcmp(name, currentEl->next->Name) < 0)
+			{
+				break;   //InsertBeforeSurname(root, name, surname, yearofbirth, currentEl->Surname);
+			}
+		}
+		currentEl = currentEl->next;
+	}
+	InsertAfterSurname(root, name, surname, yearofbirth, currentEl->Surname);
+}
+void ReadFromFileAndFillNodes(Node** root)
+{
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("File empty or not found\n");
+		return;
+	}
+	Node* student = malloc(sizeof(Node));
+	while (fscanf(file, "%s %s %d", student->Name, student->Surname, &student->YearOfBirth) >= 3)
+	{
+		InsertAtStart(root, student->Name, student->Surname, student->YearOfBirth);
+	}
+	fclose(file);
+	free(student);
+}
+void WriteIntoTheFile(Node* root)
+{
+	FILE* file = fopen("newWrittenFile.txt", "w");
+	if (file == NULL)
+	{
+		printf("File not opened correctly to write in\n");
+		return;
+	}
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		fprintf(file, "%s %s %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+		currentEl = currentEl->next;
+	}
+	fclose(file);
+}
+
+
+int main()
+{
+	Node* root = NULL;
+	Node Student = {
+		.Name = {0},
+		.Surname = {0},
+		.YearOfBirth = 0,
+		.next = NULL
+	};
+	int Choice = 0;
+	while (true)
+	{
+		printf("\r********MENU*********");
+		printf("\n1) Insert at the start of the list\n");
+		printf("2) Insert at the end of the list\n");
+		printf("3) Printf your list\n");
+		printf("4) Find by surname\n");
+		printf("5) Remove an element by surname\n");
+		printf("6) Add element after a certain surname\n");
+		printf("7) Add element before a certain surname\n");
+		printf("8) Read From File And Fill Nodes in Sorted order\n");
+		printf("9) Write current list into new text file\n");
+		printf("10) Sort current list\n");
+		printf("0) Quit \n");
+		printf("ENTER CHOICE: ");
+		scanf(" %d", &Choice);
+		switch (Choice)
+		{
+		case 1: {
+			printf("\nInsert Name, Surname, Age of birth in this format: Name Surname 2000\n");
+			scanf("%s %s %d", Student.Name, Student.Surname, &Student.YearOfBirth);
+			InsertAtStart(&root, Student.Name, Student.Surname, Student.YearOfBirth);
+			break;
+		}
+		case 2: {
+			printf("Insert Name, Surname, Age of birth in this format: Name Surname 2000\n");
+			scanf("%s %s %d", Student.Name, Student.Surname, &Student.YearOfBirth);
+			InsertEnd(&root, Student.Name, Student.Surname, Student.YearOfBirth);
+			break;
+		}
+		case 3: {
+			PrintList(root);
+			break;
+		}
+		case 4: {
+			char surname[MAX_NAME];
+			printf("Insert surname of a person you want to find: ");
+			scanf(" %s", surname);
+			FindElementSurname(root, surname);
+			break;
+		}
+		case 5: {
+			RemoveElementSurname(&root);
+			break;
+		}
+		case 6: {
+			char surname[1000];
+			printf("Insert Name, Surname, Age of birth in this format: Name Surname 2000\n");
+			printf("Insert surname u want to insert after ");
+			scanf(" %s", surname);
+			scanf("%s %s %d", Student.Name, Student.Surname, &Student.YearOfBirth);
+			InsertAfterSurname(&root, Student.Name, Student.Surname, Student.YearOfBirth, surname);
+			break;
+		}
+		case 7: {
+			char SurnameBefore[MAX_NAME];
+			printf("Insert Name, Surname, Age of birth in this format: Name Surname 2000\n");
+			scanf("%s %s %d", Student.Name, Student.Surname, &Student.YearOfBirth);
+
+			printf("Insert surname of a person you want to add the element after ");
+			scanf(" %s", SurnameBefore);
+			InsertBeforeSurname(&root, Student.Name, Student.Surname, Student.YearOfBirth, SurnameBefore);
+			break;
+		}
+
+		case 8: {
+			ReadFromFileAndFillNodes(&root);
+			break;
+		}
+		case 9: {
+			WriteIntoTheFile(root);
+			break;
+		}
+		case 10: {
+			SortList(&root);
+			break;
+		}
+		case 0: {
+			printf("GOODBYEEE!!!");
+			break;
+		}
+		default: {
+			printf("wrong input, try again: ");
+			break;
+		}
+		}
+	}
+	return 0;
+}
