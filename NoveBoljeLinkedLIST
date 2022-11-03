@@ -74,6 +74,24 @@ Node* FindElementSurname(Node* root, char* surname)
 
 	return currentEl;
 }
+Node* FindElementSurname1(Node* root, char* surname)
+{
+	int i = 0;
+	Node* currentEl = root;
+	while (currentEl != NULL)
+	{
+		if (strcmp(surname, currentEl->Surname) == 0)
+		{
+			i++;
+			//printf("%s %s - %d\n", currentEl->Name, currentEl->Surname, currentEl->YearOfBirth);
+			break;
+		}
+		currentEl = currentEl->next;
+	}
+	if (i == 0) printf("\nSurname not found in the list\n");
+
+	return currentEl;
+}
 Node* FindPreviousOfTheElement(Node* root, char* surname)
 {
 	int i = 0;
@@ -136,30 +154,30 @@ void RemoveElementSurname(Node** root)
 	}
 	printf("Surname not found\n");
 }
-void InsertAfterSurname(Node** root, char* name, char* surname, int yearofbirth)
+void InsertAfterSurname(Node** root, char* name, char* surname, int yearofbirth, char* SurnameRemove)
 {
 	Node* newNode = malloc(sizeof(Node)); if (newNode == NULL) return;
 	strcpy(newNode->Name, name);
 	strcpy(newNode->Surname, surname);
 	newNode->YearOfBirth = yearofbirth;
 
-	char SurnameRemove[MAX_NAME];
+	/*char SurnameRemove[MAX_NAME];
 	printf("Insert surname of a person you want to add the element after ");
-	scanf(" %s", SurnameRemove);
+	scanf(" %s", SurnameRemove);*/
 	//Node* currentEl = malloc(sizeof(Node));
-	Node* currentEl = FindElementSurname(*root, SurnameRemove);
+	Node* currentEl = FindElementSurname1(*root, SurnameRemove);
 
 	newNode->next = currentEl->next;
 	currentEl->next = newNode;
 }
 void InsertBeforeSurname(Node** root, char* name, char* surname, int yearofbirth, char* SurnameBefore)
 {
-	//Node* currentEl = malloc(sizeof(Node));
-	if (strcmp((*root)->Surname, SurnameBefore) == 0)
-	{
-		InsertAtStart(root, name, surname, yearofbirth);
-		return;
-	}
+	////Node* currentEl = malloc(sizeof(Node));
+	//if (strcmp((*root)->Surname, SurnameBefore) == 0)
+	//{
+	//	InsertAtStart(root, name, surname, yearofbirth);
+	//	return;
+	//}
 	Node* currentEl = FindPreviousOfTheElement(*root, SurnameBefore);
 	///*	if (currentEl->next == *root)
 	//		InsertAtStart(root, name, surname, yearofbirth*/);
@@ -179,21 +197,23 @@ void InsertSorted(Node** root, char* name, char* surname, int yearofbirth)
 		InsertAtStart(root, name, surname, yearofbirth);
 		return;
 	}
-
-	Node* currentEl = malloc(sizeof(Node));
-	while (currentEl != NULL)
+	Node* currentEl = *root;
+	while (currentEl->next != NULL)
 	{
-		if (strcmp(surname, currentEl->Surname) < 0)
-			//	{
-			break; // InsertBeforeSurname(root, name, surname, yearofbirth, currentEl->Surname);
-		// }
-		else if (strcmp(surname, currentEl->Surname) == 0)
-			if (strcmp(name, currentEl->Name) < 0)
+		if (strcmp(surname, currentEl->next->Surname) < 0)
+		{
+			break;
+		}
+		else if (strcmp(surname, currentEl->next->Surname) == 0)
+		{
+			if (strcmp(name, currentEl->next->Name) < 0)
+			{
 				break;   //InsertBeforeSurname(root, name, surname, yearofbirth, currentEl->Surname);
-
+			}
+		}
 		currentEl = currentEl->next;
 	}
-	InsertBeforeSurname(root, name, surname, yearofbirth, currentEl->Surname);
+	InsertAfterSurname(root, name, surname, yearofbirth, currentEl->Surname);
 }
 void ReadFromFileAndFillNodes(Node** root)
 {
@@ -205,7 +225,7 @@ void ReadFromFileAndFillNodes(Node** root)
 	Node* student = malloc(sizeof(Node));
 	while (fscanf(file, "%s %s %d", student->Name, student->Surname, &student->YearOfBirth) >= 3)
 	{
-		InsertAtStart(root, student->Name, student->Surname, student->YearOfBirth);
+		InsertSorted(root, student->Name, student->Surname, student->YearOfBirth);
 	}
 	fclose(file);
 	free(student);
@@ -279,10 +299,13 @@ int main()
 			break;
 		}
 		case 6: {
+			char surname[1000];
 			Node* Student = malloc(sizeof(Node));
 			printf("Insert Name, Surname, Age of birth in this format: Name Surname 2000\n");
+			printf("Insert surname u want to insert after ");
+			scanf(" %s", surname);
 			scanf("%s %s %d", Student->Name, Student->Surname, &Student->YearOfBirth);
-			InsertAfterSurname(&root, Student->Name, Student->Surname, Student->YearOfBirth);
+			InsertAfterSurname(&root, Student->Name, Student->Surname, Student->YearOfBirth, surname);
 			free(Student);
 			break;
 		}
@@ -317,4 +340,4 @@ int main()
 		}
 	}
 	return 0;
-} 
+}
