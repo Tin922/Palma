@@ -1,0 +1,380 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define ERROR 5
+
+typedef struct osoba *pozicija;
+struct osoba{
+
+    char ime[50];
+    char prezime[50];
+    int god;
+    pozicija next;
+};
+
+int ispis(pozicija p);
+int unosP(pozicija p);
+int unosK(pozicija p);
+int Trazi(pozicija p);
+int dodajIspred(pozicija p);
+int dodajIza(pozicija p);
+int citajD(pozicija p);
+int countstudent();
+int writeIntoFile(pozicija p);
+int brisi(pozicija p);
+int sortAtTheStart(pozicija p, char *ime, char *prezime, int god);
+int insertAtTheStart(pozicija p, char *ime , char *prezime ,int  god); 
+int insertAfter(pozicija p, char *ime , char *prezime ,int  god);
+
+
+
+int main()
+{
+    struct osoba Head;
+    Head.next=NULL;
+    char izbor;
+    printf("%d" ,countstudent());
+
+    while(1)    
+    {
+        printf("Odaberite I za ispis, P za unos na pocetak lise, K za unos na kraj liste, U upisi u dat, T za trazi po prezimenu,\n B za brisi, D citaj datoteku i X za izlaz\n");
+        scanf(" %s",&izbor);
+        
+        if(izbor=='I')
+            ispis(Head.next);
+
+        else if(izbor=='P')
+            unosP(&Head);
+
+        else if(izbor=='K')
+            unosK(&Head);
+
+        else if(izbor=='T')
+            Trazi(Head.next);
+        
+        else if(izbor=='B')
+            brisi(&Head);
+        
+        else if( izbor == 'D')
+            citajD(&Head);
+        else if(izbor=='U')
+            writeIntoFile(Head.next);
+        else if(izbor=='X')
+            break;
+
+        else
+            printf("Unijeli ste pogresno slovo\n");
+        
+
+    }
+
+    return 0;
+}
+
+int unosP(pozicija p)
+{
+    pozicija q=NULL;
+    q=(pozicija)malloc(sizeof(struct osoba));
+
+    if(q==NULL)
+        return ERROR;
+
+    printf("Unesi ime osobe:");
+	scanf("%s", q->ime);
+	printf("Unesi prezime osobe:");
+	scanf("%s", q->prezime);
+	printf("Unesi godinu rodenja osobe:");
+	scanf("%d", &q->god);
+
+    q->next=p->next;
+    p->next=q;
+    
+    return 0;
+}
+
+int unosK(pozicija p)
+{
+    pozicija q=NULL;
+    q=(pozicija)malloc(sizeof(struct osoba));
+
+    if(q==NULL)
+        return ERROR;
+
+    printf("Unesi ime osobe:");
+	scanf("%s", q->ime);
+	printf("Unesi prezime osobe:");
+	scanf("%s", q->prezime);
+	printf("Unesi godinu rodenja osobe:");
+	scanf("%d", &q->god);
+
+    while(p->next!=NULL)
+    {
+        p=p->next;
+    }
+
+    q->next=p->next;
+    p->next=q;
+
+    return 0;
+}
+
+int ispis(pozicija p)
+{
+    while(p!=0)
+    {
+        printf("%s %s %d\n",p->ime,p->prezime,p->god);
+        p=p->next;
+    }
+
+    return 0;
+}
+
+int Trazi(pozicija p)
+{
+    char prez[30];
+	printf("Unesi prezime osobe koju zelis pronaci:\n");
+	scanf(" %s", prez);
+	while (p != NULL && strcmp(prez, p->prezime) != 0)
+	{
+		p = p->next;
+	}
+	if (p == NULL)
+		printf("Ne postoji osoba pod tim prezimenom\n");
+	else
+		printf("Adresa trazene osobe je: %p\n", p);
+
+
+   
+    return 0;
+}
+
+int dodajIspred(pozicija p)
+{
+    pozicija q=(pozicija)malloc(sizeof(struct osoba));
+    if(q==NULL)
+        return ERROR;
+    pozicija pret= (pozicija) malloc(sizeof(struct osoba));
+    if(pret==NULL)
+        return ERROR;
+    
+    char prez[59];
+
+     printf("Unesi ime osobe:");
+	scanf("%s", q->ime);
+	printf("Unesi prezime osobe:");
+	scanf("%s", q->prezime);
+	printf("Unesi godinu rodenja osobe:");
+	scanf("%d", &q->god);
+
+    printf("unesite prezime ispred osobe koje zelite dodati\n");
+    scanf(" %s", prez);
+    
+    while(p->next != NULL && (strcmp(p->ime, prez )) != 0)
+    {
+        pret=p;
+        p=p->next;
+    }
+    
+    if(p->next != NULL)
+    {
+        pret->next=q;
+        q->next=p;
+    }
+
+    else
+        printf("nema osobe s tim prezimenom\n");
+
+    return 0;
+}
+
+int dodajIza(pozicija p)
+{
+    pozicija q=(pozicija) malloc (sizeof(struct osoba));
+
+    if(q== NULL)
+    return ERROR;
+
+    char prez[59];
+
+     printf("Unesi ime osobe:");
+	scanf("%s", q->ime);
+	printf("Unesi prezime osobe:");
+	scanf("%s", q->prezime);
+	printf("Unesi godinu rodenja osobe:");
+	scanf("%d", &q->god);
+
+    printf("unesite prezime iza osobe koje zelite dodati\n");
+    scanf(" %s", prez);
+
+    while( p->next != NULL && (strcmp(prez, p->prezime)) != 0)
+    {
+        p=p->next;
+    }
+
+    q->next=p->next;
+    p->next=q;
+    
+    return 0;
+}
+int citajD(pozicija p)
+{
+    int i;
+    int count= countstudent();
+    FILE *f=NULL;
+    f=fopen("studenti.txt", "r");
+    pozicija s = (pozicija ) malloc (sizeof(struct osoba) * count);
+
+    if(f== NULL)
+        printf("greska\n");
+
+    
+
+   for ( i= 0; i< count; i++)
+    { 
+        fscanf(f, "%s %s %d", s[i].ime, s [i].prezime , &s[i].god);
+    }
+     for ( i= 0; i< count; i++)
+    { 
+        printf("%s %s %d\n", s[i].ime, s [i].prezime , s[i].god);
+         sortAtTheStart(p, s[i].ime, s[i].prezime, s[i].god);
+    }
+   
+
+    for ( i= 0; i< count; i++)
+    {
+       
+    }
+    while(p->next!= NULL)
+    {    
+        
+        printf("%s %s %d\n", p->ime,p->prezime, p->god);
+
+    }
+    
+    fclose (f);
+    return 0;
+}
+int countstudent()
+{
+    FILE *f=NULL;
+    f=fopen("studenti.txt", "r");
+    char buffer[256]={0};
+    int count = 0;
+
+    if(f== NULL)
+        printf("greska\n");
+
+    while( !(feof(f)))
+    {
+        fgets(buffer,256,f);
+        if(strcmp(buffer, "\n")!= 0)
+                   count++;
+    }
+    printf("count studenta je %d\n", count);
+
+    
+    fclose (f);
+    return count;
+
+}
+int writeIntoFile(pozicija p)
+{
+
+    FILE *f=NULL;
+    f=fopen("ispis.txt","w");
+    if(f== NULL)
+    {
+        printf("file did not open correttly");
+        return ERROR;
+    }
+
+    while(p!=NULL)
+    {
+        fprintf(f,"%s %s %d",p->ime, p->prezime, p->god);
+        p=p->next;
+    }
+    
+    fclose(f);
+
+    return 0;
+}
+
+int brisi(pozicija p)
+{
+
+    char prezime [50]={0};
+    printf("upsite koje prezime zelite izbrisati\n");
+    scanf(" %s",prezime);
+
+    //pozicija q= (pozicija) malloc(sizeof(struct osoba));
+    pozicija pret= (pozicija) malloc(sizeof(struct osoba));
+
+    while(p->next!=NULL && strcmp(prezime , p->prezime) != 0)
+    {
+        pret=p;
+        p= p->next;
+    }
+
+    if(strcmp(prezime , p->prezime)== 0)
+    {
+        pret->next = p->next;
+        free(p);
+    }
+    else printf("ne postoji osoba s tim prezimenom");
+
+    
+
+    return 0;
+}
+
+int sortAtTheStart(pozicija p, char *ime, char *prezime, int god)
+{
+    pozicija q= (pozicija )malloc (sizeof(struct osoba));
+
+    printf("usao sam u sort at the start\n");
+     strcpy( q->ime ,ime);
+    strcpy( q->prezime, prezime);
+    q->god=god;
+
+    while( p->next != NULL)
+    {
+        if(strcmp(prezime, p->prezime)< 0)
+            insertAtTheStart(p, ime, prezime ,god); 
+        p=p->next; 
+             
+    }
+
+    insertAfter(q, ime , prezime , god);
+
+    return 0;
+}
+
+int insertAtTheStart(pozicija p, char *ime , char *prezime ,int  god)
+{
+   pozicija q = (pozicija )malloc(sizeof(struct osoba));
+
+   strcpy( q->ime ,ime);
+    strcpy( q->prezime, prezime);
+    q->god=god;
+
+    q->next=p->next;
+    p->next=q;
+
+    return 0;
+}
+
+int insertAfter(pozicija p, char *ime , char *prezime ,int  god)
+{
+    pozicija q = (pozicija )malloc(sizeof(struct osoba));
+
+    strcpy( q->ime ,ime);
+    strcpy( q->prezime, prezime);
+    q->god=god;
+
+    q->next=p->next;
+    p->next=q;
+
+    return 0;
+    
+}
