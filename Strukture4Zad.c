@@ -29,12 +29,9 @@ int main() {
 	if (rootZ == NULL)
 		return 5;
 	rootZ->next = NULL;
-	int n = 0;
-
-
+	
 	ReadFromFile(&root);
 	PrintList(root);
-
 	AddPolynoms(root, &rootZ);
 
 	printf("Zbrojeni polinomi\n");
@@ -53,21 +50,18 @@ int ReadFromFile(Node** root)
 	   .Y = 0,
 	   .next = NULL
 	};
-
+	
 	FILE* file = fopen("t.txt", "r");;
 	if (file == NULL) {
 		printf("File not opened\n");
 		return 0;
 	}
-
-	while ((fscanf(file, "%d %d", &Polinom.X, &Polinom.Y)) >= 2)
-	{
-		if (Polinom.X > 0 && Polinom.Y > 0)
+	while ((fscanf(file, "%d %d", &Polinom.X, &Polinom.Y)) >= 2){
+		if (Polinom.X > 0 && Polinom.Y >= 0)
 		{
 			insertSorted(root, Polinom.X, Polinom.Y);
 		}
 	}
-
 	return 0;
 }
 int insertAfter(Node* curr, int x, int y)
@@ -137,31 +131,26 @@ int mulitplyPolynoms(Node* root)
 	Node* curr = root->next;
 	int umnozakX = 1;
 	int zbrojY = 0;
+	
 	while (curr != NULL) {
 		umnozakX = umnozakX * curr->X;
 		zbrojY = zbrojY + curr->Y;
 		curr = curr->next;
 	}
 	printf("Umnozak polinoma = %dx^%d \n", umnozakX, zbrojY);
-//2 3
-//6 3
-//4 5
-//12 5
-//4 6
-
 	return 0;
 }
 int Deallocation(Node** root)
 {
 	Node* toRemove = NULL;
 	Node* curr = *root;
+	
 	while (curr != NULL){
 		toRemove = curr;
 		curr = curr->next;
 		free(toRemove);
 	}
 	//free(*root);
-
 	return 0;
 }
 
