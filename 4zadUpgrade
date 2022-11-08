@@ -213,7 +213,7 @@ int main() {
 	root01Z->next = NULL;
 
 	Node* rootList[5] = { NULL };
-	Node* rootListZbroj[10] = { NULL };
+
 	ReadFromFile(rootList);
 	int i = 0;
 	while (rootList[i] != NULL)
@@ -223,13 +223,21 @@ int main() {
 		i++;
 	}
 	i = 0;
-	while (rootList[i] != NULL)
-	{
-		AddPolynoms(rootList[i], &root0Z);
-		printf("%d. lista zbrojena \n", i+1);
-		PrintList(root0Z);
-		i++;
-	}
+	//while (rootList[i] != NULL)
+	//{
+	//	AddPolynoms(rootList[i], &root0Z);
+	//	printf("%d. lista zbrojena \n", i+1);
+	//	PrintList(root0Z);
+	//	i++;
+	//}
+	AddPolynoms(rootList[0], &root0Z);
+	printf("%d. lista zbrojena \n", i + 1);
+	PrintList(root0Z);
+	
+
+	AddPolynoms(rootList[1], &root1Z);
+	printf("Druga lista zbrojena \n");
+	PrintList(root1Z);
 
 	AddTwoPolynoms(root0Z, root1Z, &root01, &root01Z);
 
