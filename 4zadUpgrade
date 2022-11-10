@@ -56,10 +56,10 @@ int PrintList(Node* root)
 	}
 	return 0;
 }
-int AddPolynoms(Node* root, Node** rootZ) {
+int AddPolynoms(Node* rootList, Node** rootListZ, int i) {
 	int zbrojPolinomaX;
 	int zbrojPolinomaY;
-	Node* curr = root->next;;
+	Node* curr = rootList->next;;
 	Node* curr2 = curr;
 
 	while ((curr) != NULL) {
@@ -71,12 +71,20 @@ int AddPolynoms(Node* root, Node** rootZ) {
 			zbrojPolinomaY = curr->Y;
 
 			curr2 = curr2->next;
+		}//insertSorted(rootZ, zbrojPolinomaX, zbrojPolinomaY);
+		if ( i >= 0)	{
+			insertSorted(&(rootListZ[i]), zbrojPolinomaX, zbrojPolinomaY);
 		}
-		insertSorted(rootZ, zbrojPolinomaX, zbrojPolinomaY);
+		else if (i < 0)
+		{
+			insertSorted(rootListZ, zbrojPolinomaX, zbrojPolinomaY);
+		}
 		curr = curr2;
 	}
 	return 0;
 }
+
+
 int mulitplyPolynoms(Node* root0, Node* root1, Node** root01M) {
 	Node* curr0 = root0->next;
 	Node* curr1 = root1->next;
@@ -94,11 +102,32 @@ int mulitplyPolynoms(Node* root0, Node* root1, Node** root01M) {
 			insertSorted(root01M, umnozakX, zbrojY);
 			curr1 = curr1->next;
 		}
+		
 		curr0 = curr0->next;
 		curr1 = root1->next;
 	}
 	return 0;
 }
+
+int mulitplyPolynomsSve(Node **rootList, Node** rootListSvePomnozene) {
+	
+	Node* currMn = rootList[0];
+	Node** currMn2 = rootList[1];
+	int i = 2;
+	int j = 0;
+	mulitplyPolynoms(currMn, currMn2, rootListSvePomnozene[0]);
+	while (currMn2 != NULL)
+	{
+		currMn2 = rootList[i];
+		mulitplyPolynoms(currMn2, rootListSvePomnozene[j], rootListSvePomnozene[j+1]);
+		i++;
+		j++;
+	}
+
+	return j+1;
+}
+
+
 int Deallocation(Node** root)
 {
 	Node* toRemove = NULL;
@@ -112,25 +141,21 @@ int Deallocation(Node** root)
 	//free(*root);
 	return 0;
 }
-
 int AddTwoPolynoms(Node* root0, Node* root1, Node** root01, Node** root01Z)
 {
 	Node* curr0 = root0->next;
 	Node* curr1 = root1->next;
 
-	while (curr0 != NULL)
-	{
-
+	while (curr0 != NULL) {
 		insertSorted(root01, curr0->X, curr0->Y);
 		curr0 = curr0->next;
 	}
 
-	while (curr1 != NULL)
-	{
+	while (curr1 != NULL) {
 		insertSorted(root01, curr1->X, curr1->Y);
 		curr1 = curr1->next;
 	}
-	AddPolynoms(*root01, root01Z);
+	//	AddPolynoms(*root01, root01Z);
 
 	int zbrojPolinomaX = 0;
 	int zbrojPolinomaY = 0;
@@ -162,9 +187,7 @@ int AddTwoPolynoms(Node* root0, Node* root1, Node** root01, Node** root01Z)
 	return 0;
 
 }
-
-
-int ReadFromFile(Node** rootList)
+int ReadFromFile(Node** rootList, Node** rootListZ)
 {
 	int i = 0, n = 0, rowCount = 0;
 	Node Polinom = {
@@ -180,82 +203,96 @@ int ReadFromFile(Node** rootList)
 		printf("File not opened\n");
 		return 0;
 	}
-
-	while (!feof(file))
-	{
+	while (!feof(file)) {
 		rootList[rowCount] = malloc(sizeof(Node));
 		rootList[rowCount]->next = NULL;
+
+		rootListZ[rowCount] = malloc(sizeof(Node));
+		rootListZ[rowCount]->next = NULL;
 
 		fgets(pBuffer, 1000, file);
 		while (strlen(pBuffer) > 0) {
 			sscanf(pBuffer, "%d %d %n", &Polinom.X, &Polinom.Y, &n);
-
 			insertSorted(&(rootList[rowCount]), Polinom.X, Polinom.Y);
 
 			pBuffer = pBuffer + n;
 		}
 		rowCount++;
 	}
-
 	return 0;
 }
 int main() {
 
-	Node* root0Z = malloc(sizeof(Node));
-	root0Z->next = NULL;
-	Node* root1Z = malloc(sizeof(Node));
-	root1Z->next = NULL;
-	Node* root01M = malloc(sizeof(Node));
-	root01M->next = NULL;
-	Node* root01 = malloc(sizeof(Node));
-	root01->next = NULL;
-	Node* root01Z = malloc(sizeof(Node));
-	root01Z->next = NULL;
+		Node* rottSveUJednoj = malloc(sizeof(Node)); if (rottSveUJednoj == NULL) printf("nije alociran prostor za zbrojit sve\n");
+		rottSveUJednoj->next = NULL;
+		
+	
+		Node* root01M = malloc(sizeof(Node));
+		root01M->next = NULL;
 
-	Node* rootList[10] = { NULL };
+		Node* rootSveZbrojene2 = malloc(sizeof(Node));
+		rootSveZbrojene2->next = NULL;
+		Node* rootList[10] = { NULL };
+		Node* rootListZ[10] = { NULL };
+		Node* rootListSvePomnozene[10] = { NULL };
 
-	ReadFromFile(rootList);
-	int i = 0;
-	while (rootList[i] != NULL)
-	{
-		printf("%d. lista\n", i + 1);
-		PrintList(rootList[i]);
-		i++;
-	}
-	i = 0;
-	//while (rootList[i] != NULL)
-	//{
-	//	AddPolynoms(rootList[i], &root0Z);
-	//	printf("%d. lista zbrojena \n", i+1);
-	//	PrintList(root0Z);
-	//	i++;
-	//}
-	AddPolynoms(rootList[0], &root0Z);
-	printf("%d. lista zbrojena \n", i + 1);
-	PrintList(root0Z);
+		ReadFromFile(rootList, rootListZ);
+		int i = 0;
+		while (rootList[i] != NULL)
+		{
+			printf("%d. lista\n", i + 1);
+			PrintList(rootList[i]);
+			i++;
+		}
+	
+		i = 0;
+		while (rootList[i] != NULL)
+		{
+			AddPolynoms(rootList[i], rootListZ, i);
+			i++;
+		}
+		i = 0;
+		while (rootListZ[i] != NULL)
+		{
+			printf("%d. lista zbrojena \n", i + 1);
+			PrintList(rootListZ[i]);
+			i++;
+		}
+		i = 0;
+		while (rootListZ[i] != NULL)
+		{
+			Node* curr3 = rootListZ[i]->next;
+			while(curr3 != NULL) {
+				insertSorted(&rottSveUJednoj, curr3->X, curr3->Y);
+				curr3 = curr3->next;
+			}
+			i++;
+		}
+		printf("SVE U jednoj\n");
+		PrintList(rottSveUJednoj);
+
+		AddPolynoms(  rottSveUJednoj, &rootSveZbrojene2, -2);
+		printf("ovo je zbrojeno \n");
+		PrintList(rootSveZbrojene2);
+		
+		//AddTwoPolynoms(root0Z, root1Z, &root01, &root01Z);
+	/*		while (rootListZ[i] != NULL)
+			{
+				mulitplyPolynoms(rootListZ[i], rootListSvePomnozene);
+				i++;
+			}*/
+	/*	printf("POMNOZWENO");
+		int brojList = 	mulitplyPolynomsSve(rootListZ, rootListSvePomnozene);
+		PrintList(rootListSvePomnozene[brojList]);*/
 
 
-	AddPolynoms(rootList[1], &root1Z);
-	printf("Druga lista zbrojena \n");
-	PrintList(root1Z);
+		mulitplyPolynoms(rootList[0], rootList[1], &root01M);
+		printf("Pomnozene liste 1 i 2 \n");
 
-	AddTwoPolynoms(root0Z, root1Z, &root01, &root01Z);
+		PrintList(root01M);
 
-	printf("Lista od dvi liste spojena \n");
-	PrintList(root01);
+		//Deallocation(&root0);
+		//Deallocation(&root1);
 
-	printf("zbrojene liste zbrojene \n");
-	PrintList(root01Z);
-
-	mulitplyPolynoms(rootList[0], rootList[1], &root01M);
-	printf("Pomnozene liste 1 i 2 \n");
-
-	PrintList(root01M);
-
-
-
-	//Deallocation(&root0);
-	//Deallocation(&root1);
-
-	return 0;
+		return 0;
 }
