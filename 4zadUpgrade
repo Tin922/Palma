@@ -183,7 +183,7 @@ int ReadFromFile(Node** rootList)
 
 	while (!feof(file))
 	{
-		rootList[rowCount] = malloc(sizeof(Node) );
+		rootList[rowCount] = malloc(sizeof(Node));
 		rootList[rowCount]->next = NULL;
 
 		fgets(pBuffer, 1000, file);
@@ -212,7 +212,7 @@ int main() {
 	Node* root01Z = malloc(sizeof(Node));
 	root01Z->next = NULL;
 
-	Node* rootList[5] = { NULL };
+	Node* rootList[10] = { NULL };
 
 	ReadFromFile(rootList);
 	int i = 0;
@@ -233,7 +233,7 @@ int main() {
 	AddPolynoms(rootList[0], &root0Z);
 	printf("%d. lista zbrojena \n", i + 1);
 	PrintList(root0Z);
-	
+
 
 	AddPolynoms(rootList[1], &root1Z);
 	printf("Druga lista zbrojena \n");
