@@ -1,0 +1,98 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#define MAX_SIZE_BUFFER 1264
+
+typedef struct Node {
+	int data;
+	struct Node* next;
+}Node;
+ Node* stackTop;
+
+
+ int readFromFile(Node* root);
+void push(Node* root, int value);
+int pop(Node* root);
+int PrintList(Node* root);
+
+int main() {
+	int x = 0;
+	Node* root = malloc(sizeof(Node));
+	if (root == NULL) {
+		printf("root not allocated propertly\n");
+		return;
+	}
+	root->next = NULL;
+	stackTop = root->next;
+
+
+	for (int i = 0; i < 5; i++){
+		x = pop(root);
+		if (x != (-1))
+		{
+			printf("pop = %d\n",x);
+		}
+
+	}
+	printf("List after pop\n");
+	PrintList(root);
+	EXIT_SUCCESS;
+}
+
+int pop(Node* root) {
+	if (root->next == NULL) {
+		printf("Stack is empty\n");
+		return -1;
+	}
+
+	Node* NodeToRemove = root->next;
+	int value = NodeToRemove->data;
+	root->next = root->next->next;
+	free(NodeToRemove);
+	
+	return value;
+ }
+void push(Node* root, int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) {
+		printf("root not allocated propertly\n");
+		return;
+	}
+	newNode->data = value;
+	newNode->next = root->next;
+	root->next = newNode;
+	stackTop = newNode;
+}
+int PrintList(Node* root) {
+	Node* curr = root->next;
+	while (curr != NULL) {
+		printf("%d ", curr->data);
+		curr = curr->next;
+	}
+	printf("\n");
+	return 0;
+}
+
+int readFromFile(Node* root) {
+	char buffer[MAX_SIZE_BUFFER] = { 0 };
+	char data;
+	int n = 0;
+	int* pBuffer = buffer;
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("File not opened or empty\n");
+		return -1;
+	}
+
+	while( !feof(file))
+	{
+		fgets(buffer, MAX_SIZE_BUFFER, file);
+		while ( strlen(pBuffer) > 0) {
+			sscanf(pBuffer, "%c %n", &data, &n);
+			pBuffer = pBuffer + n;
+			push(root, data);
+		}
+	}
+}
