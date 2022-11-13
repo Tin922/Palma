@@ -9,7 +9,7 @@ typedef struct Node {
 	int data;
 	struct Node* next;
 }Node;
-
+int seek(Node* root);
  int kvocijent(Node* root);
  int umozak(Node * root);
  int zbroj(Node* root);	
@@ -27,7 +27,7 @@ int main() {
 		return;
 	}
 	root->next = NULL;
-	stackTop = root->next;
+	
 
 
 	///*for (int i = 0; i < 5; i++){
@@ -94,23 +94,47 @@ int readFromFile(Node* root) {
 		while ( strlen(pBuffer) > 0) {
 			sscanf(pBuffer, "%c %n", &data, &n);
 			pBuffer = pBuffer + n;
-			
-			if (!data) {
-				if (strcmp(data, "+") == 0)
-					zbroj(root);
-				else if (strcmp(data, "-") == 0)
-					razlika(root);
-				else if (strcmp(data, "*") == 0)
-					umnozak(root);
-				else if (strcmp(data, "/") == 0)
-					kvocijent(root);
+			 {
+				if (strcmp(data, "+") == 0) {
+					if (seek(root) >= 2)
+						zbroj(root);
+				}
+					else if (strcmp(data, "-") == 0){
+						if (seek(root) >= 2)
+							razlika(root);
+					}
+				else if (strcmp(data, "*") == 0){
+							if (seek(root) >= 2)
+								umnozak(root);
+						}
+				else if (strcmp(data, "/") == 0){
+								if (seek(root) >= 2)
+									kvocijent(root);
+							}
+				else push(root, data);
+				
 			}
-			else push(root, data);
+			
 		}
 	}
 	fclose(file);
 	return 0;
 }
+
+int seek(Node *root) {
+	if (root->next == NULL){
+		printf("List is empty");
+		return;
+	}
+	Node* curr = root->next;
+	int i = 0;
+	while (curr != NULL){
+		i++;
+		curr = curr->next
+	}
+	return i;
+}
+
 
 int zbroj(Node* root) {
 	int firstNubmer = pop(root);
