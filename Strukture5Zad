@@ -9,9 +9,11 @@ typedef struct Node {
 	int data;
 	struct Node* next;
 }Node;
- Node* stackTop;
 
-
+ int kvocijent(Node* root);
+ int umozak(Node * root);
+ int zbroj(Node* root);	
+ int razlika(Node* root);
  int readFromFile(Node* root);
 void push(Node* root, int value);
 int pop(Node* root);
@@ -28,30 +30,29 @@ int main() {
 	stackTop = root->next;
 
 
-	for (int i = 0; i < 5; i++){
-		x = pop(root);
-		if (x != (-1))
-		{
-			printf("pop = %d\n",x);
-		}
-
-	}
-	printf("List after pop\n");
+	///*for (int i = 0; i < 5; i++){
+	//	x = pop(root);
+	//	if (x != (-1))
+	//	{
+	//		printf("pop = %d\n",x);
+	//	}
+	//}*/
+	//printf("List after pop\n");
 	PrintList(root);
 	EXIT_SUCCESS;
 }
 
 int pop(Node* root) {
-	if (root->next == NULL) {
+	int value = 0;
+	if (root->next == NULL) 
 		printf("Stack is empty\n");
-		return -1;
-	}
-
-	Node* NodeToRemove = root->next;
-	int value = NodeToRemove->data;
-	root->next = root->next->next;
-	free(NodeToRemove);
 	
+	else {
+		Node* NodeToRemove = root->next;
+		value = NodeToRemove->data;
+		root->next = NodeToRemove->next;
+		free(NodeToRemove);
+	}
 	return value;
  }
 void push(Node* root, int value) {
@@ -63,7 +64,6 @@ void push(Node* root, int value) {
 	newNode->data = value;
 	newNode->next = root->next;
 	root->next = newNode;
-	stackTop = newNode;
 }
 int PrintList(Node* root) {
 	Node* curr = root->next;
@@ -75,9 +75,11 @@ int PrintList(Node* root) {
 	return 0;
 }
 
+
+
 int readFromFile(Node* root) {
 	char buffer[MAX_SIZE_BUFFER] = { 0 };
-	char data;
+	int data = 0;
 	int n = 0;
 	int* pBuffer = buffer;
 	FILE* file = fopen("t.txt", "r");
@@ -92,7 +94,45 @@ int readFromFile(Node* root) {
 		while ( strlen(pBuffer) > 0) {
 			sscanf(pBuffer, "%c %n", &data, &n);
 			pBuffer = pBuffer + n;
-			push(root, data);
+			
+			if (!data) {
+				if (strcmp(data, "+") == 0)
+					zbroj(root);
+				else if (strcmp(data, "-") == 0)
+					razlika(root);
+				else if (strcmp(data, "*") == 0)
+					umnozak(root);
+				else if (strcmp(data, "/") == 0)
+					kvocijent(root);
+			}
+			else push(root, data);
 		}
 	}
+	fclose(file);
+	return 0;
+}
+
+int zbroj(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	push(root, secondNumber+ firstNubmer  );
+	return 0;
+}
+int razlika(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	push(root,  secondNumber - firstNubmer);
+	return 0;
+}
+int umnozak(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	push(root, secondNumber * firstNubmer);
+	return 0;
+}
+int kvocijent(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	push(root, secondNumber/ firstNubmer);
+	return 0;
 }
