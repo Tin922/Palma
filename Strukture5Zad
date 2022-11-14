@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <stdbool.h>
 #define MAX_SIZE_BUFFER 1264
 
@@ -10,11 +11,11 @@ typedef struct Node {
 	struct Node* next;
 }Node;
 int seek(Node* root);
- int kvocijent(Node* root);
- int umozak(Node * root);
- int zbroj(Node* root);	
- int razlika(Node* root);
- int readFromFile(Node* root);
+int kvocijent(Node* root);
+int umnozak(Node* root);
+int zbroj(Node* root);
+int razlika(Node* root);
+int readFromFile(Node* root);
 void push(Node* root, int value);
 int pop(Node* root);
 int PrintList(Node* root);
@@ -27,7 +28,7 @@ int main() {
 		return;
 	}
 	root->next = NULL;
-	
+	readFromFile(root);
 
 
 	///*for (int i = 0; i < 5; i++){
@@ -44,9 +45,9 @@ int main() {
 
 int pop(Node* root) {
 	int value = 0;
-	if (root->next == NULL) 
+	if (root->next == NULL)
 		printf("Stack is empty\n");
-	
+
 	else {
 		Node* NodeToRemove = root->next;
 		value = NodeToRemove->data;
@@ -54,7 +55,7 @@ int pop(Node* root) {
 		free(NodeToRemove);
 	}
 	return value;
- }
+}
 void push(Node* root, int value) {
 	Node* newNode = malloc(sizeof(Node));
 	if (newNode == NULL) {
@@ -75,88 +76,125 @@ int PrintList(Node* root) {
 	return 0;
 }
 
-
-
 int readFromFile(Node* root) {
 	char buffer[MAX_SIZE_BUFFER] = { 0 };
-	int data = 0;
+	char data;
 	int n = 0;
-	int* pBuffer = buffer;
+	char* pBuffer = buffer;
 	FILE* file = fopen("t.txt", "r");
 	if (file == NULL) {
 		printf("File not opened or empty\n");
 		return -1;
 	}
 
-	while( !feof(file))
+	while (!feof(file))
 	{
 		fgets(buffer, MAX_SIZE_BUFFER, file);
-		while ( strlen(pBuffer) > 0) {
+		while (strlen(pBuffer) > 0) {
 			sscanf(pBuffer, "%c %n", &data, &n);
 			pBuffer = pBuffer + n;
-			 {
-				if (strcmp(data, "+") == 0) {
+
+			if (isdigit(data))
+				push(root, (data - '0'));
+			//push(root, (atof(data )); ovoe za char u float 
+
+			else
+			{
+				switch (data) {
+				case '+':
+				{
 					if (seek(root) >= 2)
 						zbroj(root);
-				}
-					else if (strcmp(data, "-") == 0){
-						if (seek(root) >= 2)
-							razlika(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
 					}
-				else if (strcmp(data, "*") == 0){
-							if (seek(root) >= 2)
-								umnozak(root);
-						}
-				else if (strcmp(data, "/") == 0){
-								if (seek(root) >= 2)
-									kvocijent(root);
-							}
-				else push(root, data);
-				
+					break;
+				}
+				case '-':
+				{
+					if (seek(root) >= 2)
+					{
+						razlika(root);
+
+					}
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+				case '*':
+				{
+					if (seek(root) >= 2)
+						umnozak(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+				case '/':
+				{
+					if (seek(root) >= 2)
+						kvocijent(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+					default:
+					{
+						break;
+					}
+				}
+
 			}
-			
 		}
+
 	}
 	fclose(file);
 	return 0;
 }
-
-int seek(Node *root) {
-	if (root->next == NULL){
-		printf("List is empty");
-		return;
+int seek(Node* root) {
+	if (root->next == NULL) {
+		printf("List is empty\n");
+		return -1;
 	}
 	Node* curr = root->next;
 	int i = 0;
-	while (curr != NULL){
+	while (curr != NULL) {
 		i++;
-		curr = curr->next
+		curr = curr->next;
 	}
 	return i;
 }
-
-
 int zbroj(Node* root) {
 	int firstNubmer = pop(root);
 	int secondNumber = pop(root);
-	push(root, secondNumber+ firstNubmer  );
+	printf("Zbrajanje = %d + %d = %d\n", secondNumber, firstNubmer, secondNumber + firstNubmer);
+	push(root, secondNumber + firstNubmer);
 	return 0;
 }
 int razlika(Node* root) {
 	int firstNubmer = pop(root);
 	int secondNumber = pop(root);
-	push(root,  secondNumber - firstNubmer);
+	printf("Razlika = %d - %d = %d\n", secondNumber, firstNubmer, secondNumber - firstNubmer);
+	push(root, secondNumber - firstNubmer);
 	return 0;
 }
 int umnozak(Node* root) {
 	int firstNubmer = pop(root);
 	int secondNumber = pop(root);
+	printf("Mnozenje = %d * %d = %d\n", secondNumber, firstNubmer, secondNumber * firstNubmer);
 	push(root, secondNumber * firstNubmer);
 	return 0;
 }
 int kvocijent(Node* root) {
 	int firstNubmer = pop(root);
 	int secondNumber = pop(root);
-	push(root, secondNumber/ firstNubmer);
+	printf("Djeljenje = %d / %d = %d\n", secondNumber, firstNubmer, secondNumber / firstNubmer);
+	push(root, secondNumber / firstNubmer);
 	return 0;
 }
