@@ -1,0 +1,200 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+#define MAX_SIZE_BUFFER 1264
+
+typedef struct Node {
+	float data;
+	struct Node* next;
+}Node;
+int seek(Node* root);
+int kvocijent(Node* root);
+int umnozak(Node* root);
+int zbroj(Node* root);
+int razlika(Node* root);
+int readFromFile(Node* root);
+void push(Node* root, float value);
+int pop(Node* root);
+int PrintList(Node* root);
+
+int main() {
+	int x = 0;
+	Node* root = (Node*)malloc(sizeof(Node));
+	if (root == NULL) {
+		printf("root not allocated propertly\n");
+		return -1;
+	}
+	root->next = NULL;
+	readFromFile(root);
+
+
+	///*for (int i = 0; i < 5; i++){
+	//	x = pop(root);
+	//	if (x != (-1))
+	//	{
+	//		printf("pop = %d\n",x);
+	//	}
+	//}*/
+	//printf("List after pop\n");
+	PrintList(root);
+	EXIT_SUCCESS;
+}
+
+int pop(Node* root) {
+	int value = 0;
+	if (root->next == NULL)
+		printf("Stack is empty\n");
+
+	else {
+		Node* NodeToRemove = root->next;
+		value = NodeToRemove->data;
+		root->next = NodeToRemove->next;
+		free(NodeToRemove);
+	}
+	return value;
+}
+void push(Node* root, float value) {
+	Node* newNode = (Node*)malloc(sizeof(Node));
+	if (newNode == NULL) {
+		printf("root not allocated propertly\n");
+		return;
+	}
+	newNode->data = value;
+	newNode->next = root->next;
+	root->next = newNode;
+}
+int PrintList(Node* root) {
+	Node* curr = root->next;
+	while (curr != NULL) {
+		printf("%.2f ", curr->data);
+		curr = curr->next;
+	}
+	printf("\n");
+	return 0;
+}
+
+int readFromFile(Node* root) {
+	char buffer[MAX_SIZE_BUFFER] = { 0 };
+	char data;
+	int n = 0;
+	char* pBuffer = buffer;
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("File not opened or empty\n");
+		return -1;
+	}
+
+	while (!feof(file))
+	{
+		fgets(buffer, MAX_SIZE_BUFFER, file);
+		while (strlen(pBuffer) > 0) {
+			sscanf(pBuffer, "%c %n", &data, &n);
+			pBuffer = pBuffer + n;
+
+			if (isdigit(data))
+				push(root, (data - '0'));
+			//push(root, (atof(data )); ovoe za char u float 
+
+			else
+			{
+				switch (data) {
+				case '+':
+				{
+					if (seek(root) >= 2)
+						zbroj(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+				case '-':
+				{
+					if (seek(root) >= 2)
+					{
+						razlika(root);
+
+					}
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+				case '*':
+				{
+					if (seek(root) >= 2)
+						umnozak(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+				case '/':
+				{
+					if (seek(root) >= 2)
+						kvocijent(root);
+					else {
+						printf("Not enough numbers on stack");
+						return -1;
+					}
+					break;
+				}
+					default:
+					{
+						break;
+					}
+				}
+
+			}
+		}
+
+	}
+	fclose(file);
+	return 0;
+}
+int seek(Node* root) {
+	if (root->next == NULL) {
+		printf("List is empty\n");
+		return -1;
+	}
+	Node* curr = root->next;
+	int i = 0;
+	while (curr != NULL) {
+		i++;
+		curr = curr->next;
+	}
+	return i;
+}
+int zbroj(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	printf("Zbrajanje = %d + %d = %d\n", secondNumber, firstNubmer, secondNumber + firstNubmer);
+	push(root, secondNumber + firstNubmer);
+	return 0;
+}
+int razlika(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	printf("Razlika = %d - %d = %d\n", secondNumber, firstNubmer, secondNumber - firstNubmer);
+	push(root, secondNumber - firstNubmer);
+	return 0;
+}
+int umnozak(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	printf("Mnozenje = %d * %d = %d\n", secondNumber, firstNubmer, secondNumber * firstNubmer);
+	push(root, secondNumber * firstNubmer);
+	return 0;
+}
+int kvocijent(Node* root) {
+	int firstNubmer = pop(root);
+	int secondNumber = pop(root);
+	printf("Djeljenje = %d / %d = %d\n", secondNumber, firstNubmer, secondNumber / firstNubmer);
+	push(root, secondNumber / firstNubmer);
+	return 0;
+}
