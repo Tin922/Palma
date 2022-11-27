@@ -1,0 +1,186 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
+
+typedef struct Node {
+	char Name[1000];
+	char Surname[1000];
+	int Age;
+	struct Node* next;
+}Node;
+int deallocation(Node** root);
+int writeFile(Node* root);
+int insertSorted(Node* root, char* name, char* surname, int age);
+int insertBeforeSurname(Node* root, char* name, char* surname, int age, char* afterSurname);
+int readFromFileAndInsertSorted(Node* root);
+int insertAtStart(Node* root, char* name, char* surname, int age);
+int PrintList(Node* root);
+int insertEnd(Node* root, char* name, char* surname, int age);
+int insertAfterSurname(Node* root, char* name, char* surname, int age, char* afterSurname);
+int removeElement(Node* root, char* surnameToRemove);
+
+int main() 
+	{
+	Node* root = malloc(sizeof(Node));
+	if (root == NULL) return;
+	root->next = NULL;
+
+	readFromFileAndInsertSorted(root);
+
+	PrintList(root);
+	writeFile(root);
+	deallocation(&root);
+	return 0;
+}
+int insertEnd(Node* root, char* name, char* surname, int age) {
+Node* newNode = malloc(sizeof(Node));
+if (newNode == NULL) {
+	return -1;
+}
+strcpy(newNode->Name, name);
+strcpy(newNode->Surname, surname);
+newNode->Age = age;
+
+Node* curr = root;
+while (curr->next != NULL) {
+	curr = curr->next;
+}
+curr->next = newNode;
+newNode->next = NULL;
+return 0;
+}
+int insertAtStart(Node* root, char* name, char* surname, int age) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) {
+		return -1;
+	}
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->Age = age;
+
+	newNode->next = root->next;
+	root->next = newNode;
+
+	return 0;
+}
+int readFromFileAndInsertSorted(Node* root) {
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("file is empty\n");
+		return -1;
+	}
+	Node Student = {
+		.Surname = {0},
+		.Name = {0},
+		.Age = 0,
+		.next = NULL,
+	};
+	while (fscanf(file, "%s %s %d", &Student.Name, &Student.Surname, &Student.Age) >= 3) {
+		insertSorted(root, Student.Name, Student.Surname, Student.Age);
+	}
+	fclose(file);
+	return 0;
+}
+int PrintList(Node* root) {
+	Node* curr = root->next;
+	while (curr != NULL) {
+		printf("%s %s %d\n", curr->Name, curr->Surname, curr->Age);
+		curr = curr->next;
+	}
+	return 0;
+}
+int insertAfterSurname(Node* root, char* name, char* surname, int age, char* afterSurname) {
+	Node* curr = root;
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) {
+		return -1;
+	}
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->Age = age;
+
+	while (curr->next != NULL) {
+		if (strcmp(afterSurname, curr->Surname) == 0) {
+			break;
+		}
+		curr = curr->next;
+	}
+	newNode->next = curr->next;
+	curr->next = newNode;
+	return 0;
+}
+int insertBeforeSurname(Node* root, char* name, char* surname, int age, char* afterSurname) {
+	Node* curr = root; int i = 0;
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) {
+		return -1;
+	}
+	strcpy(newNode->Name, name);
+	strcpy(newNode->Surname, surname);
+	newNode->Age = age;
+
+	while (curr->next != NULL) {
+		if (strcmp(afterSurname, curr->next->Surname) == 0) {
+			break;
+		}
+		curr = curr->next;
+	}	if (i == 0) printf("Surname not found\n");
+
+	insertAfterSurname(root, name, surname, age, curr->Surname);
+	return 0;
+}
+int insertSorted(Node* root, char* name, char* surname, int age) {
+	
+	Node* curr = root;
+	while (curr->next != NULL) {
+		if (strcmp(surname, curr->next->Surname) < 0   ){
+			break;
+	}
+		curr = curr->next;
+	}
+	insertAfterSurname(root, name, surname, age, curr->Surname);
+	return 0;
+}
+int deallocation(Node** root) {
+	Node* curr = *root;
+	while (curr != NULL) {
+		Node* toRemove = curr;
+		curr = curr->next;
+		free(toRemove);
+	}
+	//free(*root);
+	return 0;
+}
+int writeFile(Node* root) {
+	FILE* file = fopen("twerwe.txt", "w");
+	if (file == NULL) {
+		printf("file not opened ");
+		return -1;
+	}
+	Node* curr = root->next;
+	while (curr != NULL) {
+		fprintf(file, "%s %s %d\n", curr->Name, curr->Surname, curr->Age);
+		curr = curr->next;
+	}
+
+
+	fclose(file);
+	return 0;
+}
+int removeElement(Node* root, char* surnameToRemove) {
+	Node* curr = root;
+	int i = 0;
+	while (curr->next != NULL) {
+		if (strcmp(curr->next->Surname, surnameToRemove) == 0) {
+			Node* roRemove = curr->next;
+			curr->next = curr->next->next;
+			free(roRemove);
+			i = 1;
+		}
+		curr = curr->next;
+	}
+	if (i == 0) printf("surname not found");
+	return 0;
+}
