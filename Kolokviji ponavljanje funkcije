@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define ERROR 5
+
+typedef struct Cvor* pozicija;
+
+struct Cvor {
+	int el;
+	pozicija next;
+};
+
+void ispis(pozicija p);
+void unosP(int x, pozicija p);
+void unosK(int x, pozicija p);
+pozicija Trazi(int x, pozicija p);
+void Brisi(int x, pozicija p);
+pozicija TraziPret(int x, pozicija p);
+void BrisiSve(pozicija p);
+
+int main()
+{
+	struct Cvor Head;
+	Head.next = NULL;
+
+	
+	unosP(3, &Head);
+	unosP(4, &Head);
+	unosK(11, &Head);
+	unosP(5, &Head);
+	/*printf("%p\n",Trazi(5, &Head));
+	printf("%p\n", TraziPret(10, &Head));
+
+	ispis(Head.next);
+	printf("\n");*/
+	ispis(Head.next);
+	Brisi(3, &Head);
+	
+	BrisiSve(&Head);
+	ispis(Head.next);	
+
+
+	return 0;
+}
+void ispis(pozicija p)
+{
+	if (p == NULL)
+		printf("lista je prazna\n");
+	while (p != NULL)
+	{
+		printf("%d ",p->el);
+		p = p->next;
+	}
+}
+void unosP(int x, pozicija p)
+{
+	pozicija q = malloc(sizeof(struct Cvor));
+	if (q == NULL)return ERROR;
+
+	q->el = x;
+
+	q->next=p->next;
+	p->next = q;
+
+}
+void unosK(int x, pozicija p)
+{
+	pozicija q = malloc(sizeof(struct Cvor));
+	if (q == NULL)return ERROR;
+
+	q->el = x;
+
+	while (p->next != NULL)
+	{
+		p = p->next;
+	}
+	
+	q->next = p->next;
+	p->next = q;
+}
+pozicija Trazi(int x, pozicija p)
+{
+	while (p->next != NULL && p->el != x)
+	{
+		p = p->next;
+	}
+	return p;
+}
+void Brisi(int x, pozicija p)
+{
+	pozicija prev = malloc(sizeof(struct Cvor));
+	if (prev == NULL)return ERROR;
+
+	while (p->next != NULL && p->el != x)
+	{
+		prev = p;
+		p = p->next;
+	}
+	if (p->el == x )
+	{
+		prev->next = p->next;
+		free(p);
+	}
+	else printf("ne posotji taj elemetn \n");
+
+}
+pozicija TraziPret(int x, pozicija p)
+{
+	pozicija prev = malloc(sizeof(struct Cvor));
+	if (prev == NULL)return ERROR;
+
+	while (p->next != NULL && p->el != x)
+	{
+		prev = p;
+		p = p->next;
+	}
+	if (p->next == NULL)
+	{	printf("Nema tog elementa\n");
+		return NULL;
+	}
+	else
+		return prev;
+}
+void BrisiSve(pozicija p)
+{
+	pozicija prev = p;
+	while (p != NULL)
+	{
+		prev = p;
+		p = p->next;
+		free(prev);
+	}
+	
+
+}
