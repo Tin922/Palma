@@ -1,0 +1,198 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+
+typedef struct Node {
+	int x;
+	struct Node* next;
+}Node;
+Node* newNodeF(int value);
+void InsertSorted(Node* root, int value);
+
+
+void Print(Node* root) {
+	if (root->next == NULL) {
+		printf("List is empty\n");
+		return;
+	}
+	Node* curr = root->next;
+	while (curr != NULL) {
+		printf("%d ", curr->x);
+		curr = curr->next;
+	}
+}
+void insertStart(Node* root, int value) {
+	Node* newNode = newNodeF(value);
+	newNode->next = root->next;
+	root->next = newNode;
+}
+void insertEnd(Node* root, int value) {
+	Node* newNode = newNodeF(value);
+
+	if (root->next == NULL) {
+		insertStart(root, value);
+		return;
+	}
+
+	Node* curr = root->next;
+	while (curr->next != NULL) {
+		curr = curr->next;
+	}
+	curr->next = newNode;
+	newNode->next = NULL;
+
+}
+Node* newNodeF(int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return NULL;
+
+	newNode->x = value;
+
+	return newNode;
+}
+Node* findByValue(Node* root, int value) {
+	Node* curr = root->next;
+	while (curr->next != NULL) {
+		if (curr->x == value) {
+			break;
+		}
+
+		curr = curr->next;
+	}
+	return curr;
+}
+Node* findByValueBefore(Node* root, int value) {
+	Node* curr = root;
+	while (curr->next != NULL) {
+		if (curr->next->x == value) {
+			break;
+		}
+
+		curr = curr->next;
+	}
+	return curr;
+
+
+}
+void ReadFromFile(Node* root) {
+	int value = 0;
+	FILE* file = fopen("t.txt", "r");
+	if (file == NULL) {
+		printf("File not opened ");
+		return;
+	}
+	while (fscanf(file, "%d", &value) >= 1) {
+		InsertSorted(root, value);
+	}
+	fclose(file);
+}
+void insertAfterValue(Node* root, int AfterValue, int value) {
+	Node* NodeToInsertAfter = findByValue(root, AfterValue);
+	Node* newNode = newNodeF(value);
+
+	newNode->next = NodeToInsertAfter->next;
+	NodeToInsertAfter->next = newNode;
+
+}
+void insertBeforeValue(Node* root, int BeforeValue, int value) {
+
+	if (BeforeValue == root->next->x) {
+		insertStart(root, value);
+		return;
+	}
+
+	Node *NodeToInsertAfter = findByValueBefore(root, BeforeValue);
+	insertAfterValue(root, NodeToInsertAfter->x, value);
+
+}
+void removeByValue(Node* root, int value) {
+	Node* NodeToRemove = findByValue(root, value);
+	Node* beforeNodeToRemove = findByValueBefore(root, value);
+
+	beforeNodeToRemove->next = NodeToRemove->next;
+	free(NodeToRemove);
+	
+}
+void InsertSorted(Node* root, int value) {
+	if (root->next == NULL) {
+		insertStart(root, value);
+		return;
+	}
+	Node* curr = root->next;
+	while (curr->next != NULL) {
+		if (value < curr->next->x) {
+			break;
+		}
+		curr = curr->next;
+	}
+	insertAfterValue(root, curr->x, value);
+
+}
+int findMinValue(Node* root) {
+	int min = root->next->x;
+
+	Node* curr = root->next;
+	while (curr != NULL)
+	{
+		if (min > curr->x) {
+			min = curr->x;
+		}
+		curr = curr->next;
+	}
+	return min;
+}
+void removeMinValue(Node* root) {
+	int value = findMinValue(root);
+	 removeByValue(root, value);
+
+}
+void deleteAllFromMinValue(Node *root) {
+	while (root->next != NULL)
+		removeMinValue(root);
+
+}
+void deallocationFromstart(Node* root) {
+	Node* curr = root->next;
+	Node* NodeToRemove = curr;
+	while (curr != NULL) {
+		NodeToRemove = curr;
+		curr = curr->next;
+		free(NodeToRemove);
+	}
+	root->next = NULL;
+}
+
+void deallocationFromEnd(Node* root) {
+	Node* curr = root->next;
+	Node* toRemove;
+	while (root->next != NULL) {
+
+		curr = root->next;
+
+		if (curr == NULL) return;
+		while (curr->next != NULL) {
+			curr = curr->next;
+		}
+		toRemove = curr;
+		free(toRemove);
+		toRemove = NULL;
+	}
+	root->next = NULL;
+}
+
+int main() {
+	Node root;
+	root.next = NULL;
+
+	ReadFromFile(&root);
+	deallocationFromEnd(&root);
+	
+
+	Print(&root);
+
+	ReadFromFile(&root);
+	Print(&root);
+	return 0;
+}
