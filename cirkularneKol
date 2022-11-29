@@ -1,0 +1,65 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+	int x;
+	struct Node* next;
+}Node;
+
+void print(Node* root) {
+	Node* curr = root->next;
+	while (curr != root) {
+		printf("%d ", curr->x);
+		curr = curr->next;
+	}
+	/*int i = 0; Node* curr = root->next;
+	while (i<10) {
+		if( curr != root)
+			printf("%d ", curr->x);
+		curr = curr->next;
+		i++;
+	}*/
+}
+void insertStart(Node* root, int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+	newNode->x = value;
+
+	if (root->next == NULL) {
+		newNode->next = root;
+		root->next = newNode;
+		return;
+	}
+	newNode->next = root->next;
+	root->next = newNode;
+}
+void insertEnd(Node* root, int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+	newNode->x = value;
+	
+	if (root->next == NULL)
+	{
+		insertStart(root, value);
+		return;
+	}
+	Node* curr = root;
+	while (curr->next != root )	{
+		curr = curr->next;
+	}
+	newNode->next = root;
+	curr->next = newNode;
+}
+
+int main() {
+	Node root;
+	root.next = NULL;
+
+	insertStart(&root, 5);
+	insertStart(&root, 5);
+	insertEnd(&root, 524);
+	insertEnd(&root, 54);
+	print(&root);
+	return 0;
+}
