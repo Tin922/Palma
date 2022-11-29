@@ -1,0 +1,144 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+	int x;
+	struct Node* next;
+	struct Node* prev;
+}Node;
+
+void print(Node* root) {
+	if (root->next == NULL) {
+		printf("List is empty\n");
+		return;
+	}
+	Node* curr = root->next;
+	while (curr != NULL) {
+		printf("%d ", curr->x);
+		curr = curr->next;
+	}
+}
+void insertStart(Node* root, int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) {
+		return;
+	}
+	newNode->x = value;
+	newNode->next = root->next;
+	newNode->prev = root;
+	root->next = newNode;
+}
+void insertEnd(Node* root, int value) {
+	Node* newNode = malloc(sizeof(Node));
+	if (newNode == NULL) return;
+	newNode->x = value;
+
+	Node* curr = root;
+	while (curr->next != NULL) {
+		curr = curr->next;
+	}
+	newNode->next = curr->next;
+	curr->next = newNode;
+	newNode->prev = curr;
+}
+void insertAfterValue(Node* root, int afterValue, int value) {
+	int i = 0;
+	Node* curr = root->next;
+	while (curr != NULL) {
+		if (curr->x == afterValue) {
+			i++;
+			break;
+	}
+		curr = curr->next;
+	}
+	if (i == 0) {
+		printf("U typed wrong value to insert after\n");
+		return;
+	}
+		Node* newNode = malloc(sizeof(Node));
+		if (newNode == NULL) return;
+		newNode->x = value;
+
+		newNode->next = curr->next;
+		newNode->prev = curr;
+		curr->next = newNode;
+}
+void removeElementByValue(Node* root, int valueToRemove) {
+
+	Node* removeNode = root->next;
+	while (removeNode != NULL) {
+		if (removeNode->x == valueToRemove) {
+			break;
+		}
+		removeNode = removeNode->next;
+	}
+	printf("curr x = %d\n", removeNode->x);
+
+	removeNode->prev->next = removeNode->next;
+	if(removeNode->next != NULL)
+		removeNode->next->prev = removeNode->prev;
+
+	free(removeNode);
+
+}
+void removeMinValue(Node* root) {
+		int minVal = root->next->x;
+		Node* curr = root->next;
+		Node* toRemoveMinValue = curr;
+		int i = 0;
+		while (curr != NULL) {
+			if (curr->x <= minVal) {
+				minVal = curr->x;
+				toRemoveMinValue = curr;
+				i++;
+			}
+			curr = curr->next;
+		}
+		if (i != 0) {
+			printf("curr x = %d\n", minVal);
+			toRemoveMinValue->prev->next = toRemoveMinValue->next;
+			if (toRemoveMinValue->next != NULL)
+				toRemoveMinValue->next->prev = toRemoveMinValue->prev;
+			free(toRemoveMinValue);
+		} 
+}
+void Deallalocaetion(Node* root) {
+	Node* curr = root->next;
+	while (curr->next != NULL) {
+		curr = curr->next;
+		free(curr->prev);
+		
+	}
+	root->next = NULL;
+}
+void DeallocationFromEnd(Node* root) {
+	Node* curr = root;
+	while (curr->next != NULL) 
+		curr = curr->next;
+
+	while (curr->prev != root) {
+		curr = curr->prev;
+		free(curr->next);
+	}
+	root->next = NULL;
+
+}
+
+int main() {
+	Node root;
+	root.next = NULL;
+	insertEnd(&root, 21);
+	insertEnd(&root, 3);
+	insertEnd(&root, 311);
+
+	print(&root);
+	printf("after removing\n");
+	DeallocationFromEnd(&root);
+
+	//while(root.next != NULL)
+	//	removeMinValue(&root);
+
+	print(&root);
+	return 0;
+}
