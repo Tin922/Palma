@@ -1,0 +1,24 @@
+int user()
+{
+    char izbor[50];
+
+    while(1)
+    {
+        printf("Naredbe su : md, cd dir, cd, dir\n\n");
+
+        scanf(" %c", izbor);
+
+        if((strcmp(izbor, "md") == 0))
+        
+        else if((strcmp(izbor, "cd dir") == 0))
+
+        else if( (strcmp(izbor, "cd") == 0))
+
+        else if( (strcmp(izbor, "dir") == 0))
+        
+        else
+            printf("Upisali ste krivo slovo\n");
+    }
+
+   return 0; 
+   }
