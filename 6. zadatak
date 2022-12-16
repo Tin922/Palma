@@ -1,0 +1,246 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
+#define MAX_NAME (256)
+
+typedef struct Node* curr;
+typedef struct Node {
+char Name[MAX_NAME];
+curr Sibling;
+curr Kid;
+}Node;
+
+typedef struct stack* stackCurr;
+typedef struct stack {
+curr stackEL;
+stackCurr next;
+}stack;
+stackCurr newStack();
+curr newNode();
+int Push(curr p, stackCurr rootStack);
+curr Pop(stackCurr head);
+int brisi_stog(stackCurr rootStack);
+/*int createKid(curr root, char* Name) {
+curr NewNode = newNode();
+root->Kid = NewNode;
+NewNode->Kid = NULL;
+NewNode->Sibling = NULL;
+
+strcpy(NewNode->Name, Name);
+return EXIT_SUCCESS;
+}
+int createSibling(curr root, char* Name) {
+curr NewNode = newNode();
+
+root->Sibling = NewNode;
+NewNode->Sibling = NULL;
+NewNode->Kid = NULL;
+strcpy(NewNode->Name, Name);
+//
+// */
+//}
+curr FindName(curr root, char name[MAX_NAME], curr* temp);
+curr deleteAll(curr root);
+int insertSibling(curr root, char insertName[MAX_NAME], stackCurr rootStack);
+int insertKid(curr root, char insertName[MAX_NAME], stackCurr rootStack);
+
+int printAllDir(curr root);
+
+int main() {
+
+Node root;
+root.Kid = NULL;
+root.Sibling = NULL;
+
+stackCurr rootStack = malloc(sizeof(stack));
+if (rootStack == NULL)
+return;
+
+char izbor[50] = { 0 };
+char name[50];
+
+while (1)
+{
+printf("Naredbe su : mds, mdk,  cd dir, cd, dir, del\n\n");
+
+scanf(" %s", izbor);
+
+if ((strcmp(izbor,"mds") == 0))
+{
+printf("Upisite siblinga\n");
+scanf(" %s", name);
+insertSibling( &root, name, rootStack);
+}
+
+else if ((strcmp(izbor, "mdk") == 0))
+{
+printf("upisite dijete\n");
+scanf(" %s", name);
+insertKid(&root, name, rootStack);
+}
+
+else if ((strcmp(izbor, "cd dir") == 0))
+{
+curr temp;
+printf("upisite ime direktorija gdje zelite ici\n");
+scanf(" %s", name);
+FindName(&root, name, &temp);
+}
+
+else if ((strcmp(izbor, "cd") == 0))
+{
+curr Previous = Pop(rootStack);
+}
+
+else if ((strcmp(izbor, "dir") == 0))
+{
+printAllDir(&root);
+}
+
+else if ((strcmp(izbor, "del") == 0))
+{
+deleteAll(&root);
+}
+
+else
+{
+printf("Upisali ste krivo slovo\n");
+break;
+}
+
+}
+
+return 0;
+}
+
+stackCurr newStack()
+{
+stackCurr newNode = malloc(sizeof(newNode));
+if (NULL == newNode)
+{
+printf("Greska u alokaciji memorije\n");
+return NULL;
+}
+newNode->stackEL = NULL;
+newNode->next = NULL;
+
+return newNode;
+}
+curr newNode()
+{
+curr newNode = NULL;
+newNode = malloc(sizeof(newNode));
+if (NULL == newNode)
+{
+printf("Greska u alokaciji memorije\n");
+return NULL;
+}
+newNode->Kid = NULL;
+newNode->Sibling = NULL;
+
+return newNode;
+}
+int Push(curr p, stackCurr rootStack) {
+stackCurr s = newStack();
+s->stackEL = p;
+s->next = rootStack->next;
+rootStack->next = s;
+return EXIT_SUCCESS;
+}
+curr Pop(stackCurr head) {
+stackCurr PopP = head->next;
+if (PopP == NULL) {
+return NULL;
+}
+curr p = PopP->stackEL;
+head->next = PopP->next;
+free(PopP);
+return p;
+}
+int brisi_stog(stackCurr rootStack) {
+while (rootStack->next != NULL)
+{
+stackCurr toFree = rootStack->next;
+rootStack->next = toFree->next;
+free(toFree);
+}
+free(rootStack);
+
+return EXIT_SUCCESS;
+}
+curr FindName(curr root, char name[MAX_NAME], curr* temp) {
+if (root == NULL)
+return NULL;
+
+if (strcmp(root->Name, name) == 0) {
+*temp = root;
+return NULL;
+}
+FindName(root->Sibling, name, temp);
+FindName(root->Kid, name, temp);
+}
+curr deleteAll(curr root) {
+if (root == NULL)
+return NULL;
+
+deleteAll(root->Sibling);
+deleteAll(root->Kid);
+free(root);
+return NULL;
+}
+int insertSibling(curr root, char insertName[MAX_NAME], stackCurr rootStack) {
+
+if (root->Kid == NULL) {
+curr newNode1 = newNode();
+return 0;
+}
+root = root->Kid;
+
+while (root != NULL) {
+if (strcmp(root->Name, root->Sibling->Name) < 0) {
+break;
+}
+root = root->Sibling;
+}
+curr newNode1 = newNode();
+strcpy(newNode1->Name, insertName);
+
+newNode1->Sibling = root->Sibling;
+root->Sibling = newNode1;
+
+Push(newNode1, rootStack);
+
+return 0;
+}
+int insertKid(curr root, char insertName[MAX_NAME], stackCurr rootStack) {
+if (root->Kid == NULL) {
+curr newNode1 = newNode();
+return 0;
+}
+root = root->Kid;
+
+while (root != NULL) {
+if (strcmp(root->Name, root->Kid->Name) < 0)
+break;
+
+root = root->Kid;
+}
+
+curr newNode1 = newNode();
+newNode1->Kid = root->Kid;
+strcpy(newNode1->Name, insertName);
+
+root->Kid = newNode1;
+Push(newNode1, rootStack);
+return 0;
+}
+int printAllDir(curr root) {
+if (root == NULL) {
+return NULL;
+}
+printf("%s\n", root->Name);
+printAllDir(root->Sibling);
+printAllDir(root->Kid);
+}
