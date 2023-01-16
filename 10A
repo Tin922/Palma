@@ -1,0 +1,239 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <time.h>
+
+typedef struct Grad* GradCurr;
+typedef struct Drzava* DrzavaCurr;
+
+typedef struct Drzava {
+	char drzavaIme[100];
+	struct Drzava* next;
+	struct Grad* TreeRoot;
+}Drzava;
+
+typedef struct  Grad {
+	char gradIme[100];
+	struct Grad* left;
+	struct Grad* right;
+	int brojStanovnika;
+}Grad;
+
+int findCitiesAboveNumber(Grad* rootTree, int upRange);
+Drzava* findCountry(Drzava* root, char* nameToFind);
+int insertTree(Grad** gradRoot, char* imeGrada, int brojStanovnikagrada);
+Grad* readGradovi(char* bufferFileDrzave);
+int insertSorted(Drzava** rootDrz, char* imeDrzav, char* bufferFileDrzave);
+int PrintDrzave(Drzava* root);
+int readDrzave(Drzava* rootDrz);
+Drzava* newDrzavaF(char* drzavaIme);
+Grad* newGradF(char* gradIme, int brojSt);
+int insertStart(Drzava* root, char* imeDrzave);
+int insertAfter(Drzava* root, char* insertAfterDrzava, char* imeDrzave, Drzava* newDrzava);
+void printGradove(Grad* grad);
+
+int main() {
+	char drzavaBuff[100] = { 0 };
+	Drzava* drzava1 = NULL;
+	int upRange = 0;
+	Drzava* root = malloc((sizeof(Drzava)));
+	if (root == NULL) {
+		return;
+	}
+	root->next = NULL;
+
+	readDrzave(&root);
+	PrintDrzave(root);
+
+	printf("Unesite drzavu za koju zelite pretraziti gradove = ");
+
+	scanf("%s", drzavaBuff);
+	drzava1 = findCountry(root, drzavaBuff);
+	printf("\nUnesite iznad kojega broja stanovnika zelite pretraziti gradove = ");
+	scanf("%d", &upRange);
+	findCitiesAboveNumber(drzava1->TreeRoot, upRange);
+
+	return 0;
+}
+
+int readDrzave(Drzava** rootDrz) {
+	FILE* file = fopen("drzave.txt", "r");
+	char bufferDrzava[100] = { 0 };
+	char bufferFileDrzave[100] = { 0 };
+	if (file == NULL) {
+		printf("File drzave.txt not opened properly\n");
+		return -1;
+	}
+	while (fscanf(file, "%s %s", bufferDrzava, bufferFileDrzave) >= 2) {
+		insertSorted(rootDrz, bufferDrzava, bufferFileDrzave);
+	}
+	fclose(file);
+}
+int insertSorted(Drzava** rootDrz, char* imeDrzave, char* bufferFileDrzave) {
+	Drzava* curr = *rootDrz;
+	Drzava* newDrzava = newDrzavaF(imeDrzave);
+
+	newDrzava->TreeRoot = readGradovi(bufferFileDrzave);
+
+	while (curr->next != NULL) {
+		if (strcmp(newDrzava->drzavaIme, curr->next->drzavaIme) < 0){
+			break;
+		}
+		curr = curr->next;
+	}
+	insertAfter(*rootDrz, curr->drzavaIme, newDrzava->drzavaIme, newDrzava);
+	return 0;
+}
+Grad* readGradovi(char* bufferFileDrzave) {
+	FILE* file = fopen(bufferFileDrzave, "r");
+	char imeGrada[100] = { 0 };
+	int brojStanovnikagrada = 0;
+	Grad* gradRoot = NULL;
+	Grad* gradPointer;
+
+	if (file == NULL){
+		printf("File grad not opened properly\n");
+		return -1;
+	}
+
+	while (fscanf(file, "%s %d", imeGrada, &brojStanovnikagrada) >= 2) {
+		insertTree(&gradRoot, imeGrada, brojStanovnikagrada);
+	}
+	return gradRoot;
+}
+int gradCompare(Grad* grad1, Grad* grad2) {
+	int result = 0;
+
+	result = grad1->brojStanovnika - grad2->brojStanovnika;
+	if (result == 0) {
+		result = strcmp(grad1->gradIme, grad2->gradIme);
+	}
+	return result;
+}
+int insertTree(Grad** gradRoot, char* imeGrada,int brojStanovnikagrada) {
+	if (*gradRoot == NULL) {	
+		(*gradRoot) = newGradF(imeGrada, brojStanovnikagrada);
+			return 0;
+	}
+	Grad* curr = *gradRoot;
+	Grad* newGrad = newGradF(imeGrada, brojStanovnikagrada);
+
+	while (curr->left != NULL || curr->right != NULL) {
+		if ((gradCompare(newGrad, curr) < 0) && (curr->left != NULL)) {
+			curr = curr->left;
+		}
+		else if ((gradCompare(newGrad, curr) > 0) && (curr->right != NULL)) {
+			curr = curr->right;
+		}
+		else break;
+	}
+	if (gradCompare(newGrad, curr) < 0) {
+		curr->left = newGrad;
+	}
+	else if (gradCompare(newGrad, curr) > 0) {
+		curr->right = newGrad;
+	}
+	return 0;
+}
+Drzava* newDrzavaF(char* drzavaIme)
+{
+	Drzava* newdrzava = malloc(sizeof(Drzava));
+	if (newdrzava == NULL) {
+		printf("NewDrzava not allocated properly\n");
+		return NULL;
+	}
+	strcpy(newdrzava->drzavaIme, drzavaIme);
+	newdrzava->next = NULL;
+	newdrzava->TreeRoot = NULL;
+	return newdrzava;
+}
+Grad* newGradF(char* gradIme, int brojSt) {
+	Grad* newGrad = malloc(sizeof(Drzava));
+	if ( newGrad == NULL){
+		printf("NewDrzava not allocated properly\n");
+		return NULL;
+	}
+	strcpy(newGrad->gradIme, gradIme);
+	newGrad->brojStanovnika = brojSt;
+	newGrad->left = NULL;
+	newGrad->right = NULL;
+
+	return newGrad;
+
+}
+int insertStart(Drzava* root, char* imeDrzave) {
+	Drzava* newDrzava = newDrzavaF(imeDrzave);
+	newDrzava->next = root->next;
+	root->next = newDrzava;
+	strcpy(newDrzava->drzavaIme, imeDrzave);
+
+	return 0;
+}
+int insertAfter(Drzava* root, char* insertAfterDrzava, char* imeDrzave, Drzava* newDrzava) {
+	Drzava* curr = root;
+
+	while (curr != NULL) {
+		if (strcmp(curr->drzavaIme, insertAfterDrzava) == 0) {
+			break;
+		}
+		curr = curr->next;
+	}
+	
+	newDrzava->next = curr->next;
+	curr->next = newDrzava;
+
+	return 0;
+}
+int PrintDrzave(Drzava* root)
+{
+	Drzava* currentEl = root->next;
+	while (currentEl != NULL)
+	{
+	printf("\n%s\n", currentEl->drzavaIme);
+	printGradove((currentEl->TreeRoot));
+	currentEl = currentEl->next;
+	}
+	return 0;
+}
+void printGradove(Grad* grad) {
+	if (grad == NULL) return;
+	printf("%s ==  %d\n", grad->gradIme, grad->brojStanovnika);
+	 printGradove(grad->left);
+	 printGradove(grad->right);
+
+}
+Drzava* findCountry(Drzava* root, char* nameToFind) {
+	Drzava* curr = root->next;
+
+	while (curr != NULL) {
+		if (strcmp(nameToFind, curr->drzavaIme) == 0) {
+			printf("\nCountry found -> %s", curr->drzavaIme);
+			break;
+		}
+		curr = curr->next;
+	}
+	return curr;
+}
+int findCitiesAboveNumber(Grad* rootTree, int upRange) {
+	Grad* curr = rootTree;
+
+	while (curr != NULL) {
+		if (curr->brojStanovnika < upRange) {
+				curr = curr->right;
+		}
+		else if (curr->brojStanovnika > upRange) {
+			printf("%s == %d\n", curr->gradIme, curr->brojStanovnika);
+
+			printGradove(curr->right);
+			curr = curr->left;
+		}
+		else {
+			printf("%s == %d\n", curr->gradIme, curr->brojStanovnika);
+			printGradove(curr->right);
+			break;
+		}
+	}
+	return 0;
+}
