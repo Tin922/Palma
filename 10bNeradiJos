@@ -1,0 +1,154 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <time.h>
+
+
+typedef struct Grad* GradCurr;
+
+typedef struct Drzava* DrzavaCurr;
+
+
+typedef struct Grad {
+	struct Grad* next;
+	char* imeGrada[100];
+	int brojStanovnika;
+}Grad;
+
+
+typedef struct Drzava {
+	char* imeDrzave[100];
+	struct Drzava* left;
+	struct Drzava* right;
+	struct Grad* gradPointer;
+}Drzava;
+
+int cityCompare(Grad* grad1, Grad* grad2);
+Grad* newGradF(char* imeGrada, int brojst);
+int insertSortedGrad(Grad** rootGrad, char* buferGrad, int brojStanovnika);
+Grad* readGradovi(char* bufferDrzavaFile);
+int insertTree(Drzava** rootDrz, char* bufferDrz, char* bufferFileDrz);
+int ReadDrzave(Drzava** rootDrz);
+Drzava* newDrzavaF(char* imeDrzave);
+
+
+int main() {
+	Drzava* rootDrz = NULL;
+
+	ReadDrzave(&rootDrz);
+
+	printf("%s", rootDrz->imeDrzave);
+	printf("%s", rootDrz->left->imeDrzave);
+
+}
+int ReadDrzave(Drzava** rootDrz) {
+	char bufferDrz[100] = { 0 };
+	char bufferFileDrz[100] = { 0 };
+
+	FILE* file = fopen("drzave.txt", "r");
+	if (file == NULL) {
+		printf("File not opened");
+		return -1;
+	}
+
+	while (fscanf(file, "%s %s", bufferDrz, bufferFileDrz) >= 2) {
+		insertTree(rootDrz, bufferDrz, bufferFileDrz);
+
+	}
+	fclose(file);
+}
+int insertTree(Drzava** rootDrz, char* bufferDrz, char* bufferFileDrz) {
+	if (*rootDrz == NULL) {
+		*rootDrz = newDrzavaF(bufferDrz);
+
+		return 0;
+	}
+	Drzava* newDrzava = newDrzavaF(bufferDrz);
+
+	Drzava* curr = *rootDrz;
+	while (curr->left != NULL || curr->right != NULL) {
+
+		if ((strcmp(bufferDrz, curr->imeDrzave) > 0) && (curr->right != NULL)) {
+			curr = curr->right;
+		}
+		else if ((strcmp(bufferDrz, curr->imeDrzave) < 0) && (curr->right != NULL)) {
+			curr = curr->left;
+		}
+		else break;
+	}
+	if (strcmp(bufferDrz, curr->imeDrzave) > 0) {
+		curr->right = newDrzava;
+	}
+	else {
+		curr->left = newDrzava;
+	}
+	newDrzava->gradPointer = readGradovi(bufferFileDrz);
+}
+Drzava* newDrzavaF(char* imeDrzave) {
+	Drzava* newDrzava = malloc(sizeof(Drzava));
+	if (newDrzava == NULL) {
+		return NULL;
+	}
+	strcpy(newDrzava->imeDrzave, imeDrzave);
+	newDrzava->left = NULL;
+	newDrzava->right = NULL;
+
+	return newDrzava;
+}
+Grad* newGradF(char* imeGrada, int brojst) {
+	Grad* newDrzava = malloc(sizeof(Grad));
+	if (newDrzava == NULL) {
+		return NULL;
+	}
+	strcpy(newDrzava->imeGrada, imeGrada);
+	newDrzava->next = NULL;
+	newDrzava->brojStanovnika = brojst;
+
+	return newDrzava;
+}
+Grad* readGradovi(char* bufferDrzavaFile) {
+	char buferGrad[100] = { 0 };
+	int brojStanovnika = 0;
+	Grad* rootGrad = NULL;
+
+	FILE* file = fopen(bufferDrzavaFile, "r");
+	if (file == NULL) {
+		printf("File not opened");
+		return  NULL;
+	}
+
+	while (fscanf(file, "%s %d", buferGrad, &brojStanovnika) >= 2) {
+
+		insertSortedGrad(&rootGrad, buferGrad, brojStanovnika);
+	}
+	return rootGrad;
+}
+int cityCompare(Grad* grad1, Grad* grad2) {
+	int result = 0;
+	result = grad1->brojStanovnika - (grad2->brojStanovnika);
+	if (result == 0) {
+		result = strcmp(grad1->imeGrada, grad2->imeGrada);
+	}
+	return result;
+}
+int insertSortedGrad(Grad** rootGrad, char* buferGrad, int brojStanovnika) {
+	if ((*rootGrad) == NULL) {
+		(*rootGrad) = newGradF(buferGrad, brojStanovnika);
+		return 0;
+	}
+	Grad* curr = *rootGrad;
+	Grad* gradInsert = newGradF(buferGrad, brojStanovnika);
+
+	while (curr->next != NULL) {
+		if (cityCompare(gradInsert, curr->next) < 0) {
+			break;
+		}
+		curr = curr->next;
+	}
+	gradInsert->next = curr;
+	curr->next = gradInsert;
+
+	return 0;
+}
